@@ -36,5 +36,5 @@ Usage
 library(sohungry)
 library(dplyr)
 x <- so_isotopes()
-x %>% filter(taxon_name=="Electrona carlsbergi")
+x %>% filter(taxon_name=="Electrona carlsbergi") %>% select(delta_13c_mean,delta_15n_mean)
 ```
