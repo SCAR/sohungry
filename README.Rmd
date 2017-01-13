@@ -1,0 +1,40 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# sohungry
+
+Overview
+--------
+
+This R package provides access to the SCAR Southern Ocean Diet and Energetics Database: see http://data.aad.gov.au/trophic/.
+
+
+Installing
+----------
+
+```{r, eval=FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("SCAR/sohungry")
+```
+
+Usage
+-----
+
+```{r, message=FALSE}
+library(sohungry)
+library(dplyr)
+x <- so_isotopes()
+x %>% filter(taxon_name=="Electrona carlsbergi")
+```
