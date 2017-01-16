@@ -54,3 +54,32 @@ filter_by_name <- function(x,name,name_type) {
     flt <- paste(flt,collapse=" | ")
     x %>% filter_(flt)
 }
+
+#' Filter out diet data below a given importance threshold
+#'
+#' A diet record is retained if any of the importance measures are above the threshold.
+#' Records with all-NA importance values will be removed.
+#'
+#' @param x data.frame: diet data, as returned by \code{so_diet}
+#' @param threshold numeric: remove entries below this threshold
+#' @param which_measures string: one or more of "fraction_diet_by_weight", "fraction_diet_by_prey_items", "fraction_occurrence", or "any" (shorthand for all three)
+#'
+#' @return data.frame
+#'
+#' @seealso \code{\link{so_diet}}, \code{\link{replace_by_importance}}
+#'
+#' @examples
+#' \dontrun{
+#'   x <- so_isotopes()
+#'   x %>% filter_by_importance(0.1)
+#' }
+#'
+#' @export
+filter_by_importance <- function(x,threshold,which_measures="any") {
+    assert_that(is.number(threshold))
+    assert_that(is.character(which_measures))
+    which_measures <- match.arg(tolower(which_measures),c("any","fraction_diet_by_weight","fraction_diet_by_prey_items","fraction_occurrence"))
+    if (which_measures=="any") which_measures <- c("fraction_diet_by_weight","fraction_diet_by_prey_items","fraction_occurrence")
+    flt <- paste0(which_measures,">=threshold",collapse=" | ")
+    x %>% filter_(as.formula(paste0("~",flt)))
+}
