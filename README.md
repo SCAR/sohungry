@@ -23,8 +23,17 @@ Usage
 ``` r
 library(sohungry)
 library(dplyr)
-#> Warning: package 'dplyr' was built under R version 3.3.1
+```
+
+Load the desired dataset using `so_isotopes()` or `so_diet()`. Note that these read the data from the server (or cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory:
+
+``` r
 x <- so_isotopes()
+```
+
+Filter the data:
+
+``` r
 x %>% filter(taxon_name=="Electrona carlsbergi") %>% select(delta_13c_mean,delta_15n_mean)
 #> # A tibble: 2 × 2
 #>   delta_13c_mean delta_15n_mean
