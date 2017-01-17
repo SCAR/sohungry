@@ -3,6 +3,8 @@
 sohungry
 ========
 
+[![Travis-CI Build Status](https://travis-ci.org/SCAR/sohungry.svg?branch=master)](https://travis-ci.org/SCAR/sohungry)
+
 Overview
 --------
 
