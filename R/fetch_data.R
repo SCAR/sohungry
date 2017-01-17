@@ -37,6 +37,8 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         suppress(x <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$diet_file)))
         names(x) <- tolower(names(x))
         ##if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
+        ## ensure dietary importance measures are numeric
+        x <- x %>% mutate_(fraction_diet_by_weight=~as.numeric(fraction_diet_by_weight),fraction_diet_by_prey_items=~as.numeric(fraction_diet_by_prey_items),fraction_occurrence=~as.numeric(fraction_occurrence))
         suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$diet_sources_file)))
         names(xs) <- tolower(names(xs))
         xs$doi <- as.character(NA)
