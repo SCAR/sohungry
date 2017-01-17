@@ -10,12 +10,12 @@
 #'
 #' @return data.frame with columns:
 #' \itemize{
-#'    \item{"fraction_diet_by_weight"}{Mean fraction of diet by weight}
-#'    \item{"N_fraction_diet_by_weight"}{Number of diet observations where fraction of diet by weight was quantified}
-#'    \item{"fraction_occurrence"}{Mean fraction of occurrence}
-#'    \item{"N_fraction_occurrence"}{Number of diet observations where fraction of occurrence quantified}
-#'    \item{"fraction_diet_by_prey_items"}{Mean fraction of diet by number of prey items}
-#'    \item{"N_fraction_diet_by_prey_items"}{Number of diet observations where fraction of diet by number of prey items was quantified}
+#'    \item{fraction_diet_by_weight - mean fraction of diet by weight}
+#'    \item{N_fraction_diet_by_weight - number of diet observations where fraction of diet by weight was quantified}
+#'    \item{fraction_occurrence - mean fraction of occurrence}
+#'    \item{N_fraction_occurrence - number of diet observations where fraction of occurrence quantified}
+#'    \item{fraction_diet_by_prey_items - mean fraction of diet by number of prey items}
+#'    \item{N_fraction_diet_by_prey_items - number of diet observations where fraction of diet by number of prey items was quantified}
 #' }
 #'
 #' @examples
