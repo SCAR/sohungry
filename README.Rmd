@@ -40,12 +40,28 @@ library(sohungry)
 library(dplyr)
 ```
 
-Load the desired dataset using `so_isotopes()` or `so_diet()`. Note that these read the data from the server (or cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory:
+Load the desired dataset using `so_isotopes()` or `so_diet()`. Note that these read the data from the server (or cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory.
+Load the stable isotope data:
 ```{r, message=FALSE}
-x <- so_isotopes()
+xi <- so_isotopes()
 ```
 
-Filter the data:
+Filter to taxon of interest:
 ```{r, message=FALSE}
-x %>% filter(taxon_name=="Electrona carlsbergi") %>% select(delta_13c_mean,delta_15n_mean)
+xi %>% filter(taxon_name=="Electrona carlsbergi") %>% select(delta_13c_mean,delta_15n_mean)
+```
+
+Load the diet data (stomach content analyses and similar):
+```{r, message=FALSE}
+x <- so_diet()
+```
+
+A summary of what *Electrona carlsbergi* eats:
+```{r, message=FALSE}
+x %>% filter_by_predator_name("Electrona carlsbergi") %>% diet_summary(summary_type="prey")
+```
+
+And what eats *Electrona carlsbergi*:
+```{r, message=FALSE}
+x %>% filter_by_prey_name("Electrona carlsbergi") %>% diet_summary(summary_type="predators")
 ```
