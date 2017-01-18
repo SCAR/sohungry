@@ -1,10 +1,11 @@
 #' Diet summaries from the SCAR Southern Ocean Diet and Energetics Database
 #'
-#' Given a predator (prey) name, the prey (predators) are aggregated to group level.
+#' Given a diet data.frame, the prey or predators are aggregated to group level and dietary importance values reported.
+#' Note that dietary importance values are currently calculated by unweighted averaging across studies (so that e.g. a
+#' study of 100 individuals will carry the same weight as a study of one individual).
 #'
 #' @param x data.frame: diet data, as returned by \code{so_diet}
-#' @param predator_name string: name of predator taxon
-#' @param prey_name string: name of prey taxon
+#' @param summary_type string: either "predators" (report the predators in the data) or "prey" (report the prey items)
 #' @param minimum_importance numeric: ignore records with dietary importance less than this threshold
 #' @param treat_trace_values_as numeric: what numeric value to use for a dietary item recorded as "trace"
 #'
@@ -24,22 +25,25 @@
 #'   x <- so_diet()
 #'
 #'   ## summary of what Electrona carlsbergi eats
-#'   x %>% diet_summary(predator_name="Electrona carlsbergi")
+#'   x %>% filter_by_predator_name("Electrona carlsbergi") %>%
+#'   diet_summary(summary_type="prey")
 #'
 #'   ## summary of what eats Electrona carlsbergi
-#'   x %>% diet_summary(prey_name="Electrona carlsbergi")
+#'   x %>% filter_by_prey_name("Electrona carlsbergi") %>%
+#'   diet_summary(summary_type="predators")
 #' }
 #'
 #' @export
-diet_summary <- function(x,predator_name,prey_name,minimum_importance=0,treat_trace_values_as=0) {
-    if (missing(predator_name) && missing(prey_name)) stop("require one of predator_name or prey_name")
-
-    ## retrieve data without applying min importance yet
-    if (!missing(predator_name)) {
-        out <- x %>% filter_by_name(name=predator_name,name_type="predator") %>% mutate_(group=~prey_group_name)
-    } else if (!missing(prey_name)) {
-        out <- x %>% filter_by_name(name=prey_name,name_type="prey") %>% mutate_(group=~predator_group_name)
+diet_summary <- function(x,summary_type="prey",minimum_importance=0,treat_trace_values_as=0) {
+    assert_that(is.string(summary_type))
+    summary_type <- match.arg(tolower(summary_type),c("prey","predators"))
+    ## rename appropriate col to "group"
+    if (summary_type=="prey") {
+        out <- x %>% mutate_(group=~prey_group_name)
+    } else {
+        out <- x %>% mutate_(group=~predator_group_name)
     }
+    ## deal with trace values before aggregation
     out <- out %>% replace_trace_values(treat_trace_values_as)
     ## aggregate by group
     out <- out %>% group_by_(~group) %>%
@@ -54,7 +58,7 @@ diet_summary <- function(x,predator_name,prey_name,minimum_importance=0,treat_tr
         filter_by_importance(threshold=minimum_importance) %>% ##apply minimum importance threshold now, after aggregation
         filter_(~(fraction_diet_by_weight>0 | fraction_occurrence>0 | fraction_diet_by_prey_items>0) | (all_zero_count))
     ##last OR condition is special case: if all dietary importance measures are null for this group, we still want to show it
-    if (!missing(predator_name)) {
+    if (summary_type=="prey") {
         out %>% select_(quote(-all_zero_count)) %>% rename_(prey=~group)
     } else {
         out %>% select_(quote(-all_zero_count)) %>% rename_(predator=~group)

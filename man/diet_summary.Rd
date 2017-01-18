@@ -4,15 +4,13 @@
 \alias{diet_summary}
 \title{Diet summaries from the SCAR Southern Ocean Diet and Energetics Database}
 \usage{
-diet_summary(x, predator_name, prey_name, minimum_importance = 0,
+diet_summary(x, summary_type = "prey", minimum_importance = 0,
   treat_trace_values_as = 0)
 }
 \arguments{
 \item{x}{data.frame: diet data, as returned by \code{so_diet}}
 
-\item{predator_name}{string: name of predator taxon}
-
-\item{prey_name}{string: name of prey taxon}
+\item{summary_type}{string: either "predators" (report the predators in the data) or "prey" (report the prey items)}
 
 \item{minimum_importance}{numeric: ignore records with dietary importance less than this threshold}
 
@@ -30,7 +28,9 @@ data.frame with columns:
 }
 }
 \description{
-Given a predator (prey) name, the prey (predators) are aggregated to group level.
+Given a diet data.frame, the prey or predators are aggregated to group level and dietary importance values reported.
+Note that dietary importance values are currently calculated by unweighted averaging across studies (so that e.g. a
+study of 100 individuals will carry the same weight as a study of one individual).
 }
 \examples{
 \dontrun{
@@ -38,10 +38,12 @@ Given a predator (prey) name, the prey (predators) are aggregated to group level
   x <- so_diet()
 
   ## summary of what Electrona carlsbergi eats
-  x \%>\% diet_summary(predator_name="Electrona carlsbergi")
+  x \%>\% filter_by_predator_name("Electrona carlsbergi") \%>\%
+  diet_summary(summary_type="prey")
 
   ## summary of what eats Electrona carlsbergi
-  x \%>\% diet_summary(prey_name="Electrona carlsbergi")
+  x \%>\% filter_by_prey_name("Electrona carlsbergi") \%>\%
+  diet_summary(summary_type="predators")
 }
 
 }
