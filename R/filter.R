@@ -1,6 +1,8 @@
 #' Filter data by predator, prey, or taxon name
 #'
 #' A convenience function that matches on the species and/or group names.
+#' \code{filter_by_predator_name} is a convenience shorthand for \code{filter_by_name(...,name_type="predator")}
+#' \code{filter_by_prey_name} is a convenience shorthand for \code{filter_by_name(...,name_type="prey")}
 #'
 #' @param x data.frame: diet data as returned by e.g. \code{so_diet} or \code{so_isotopes}
 #' @param name character: vector of one or more names to match on
@@ -14,6 +16,11 @@
 #' \dontrun{
 #'   x <- so_isotopes()
 #'   x %>% filter_by_name(c("Electrona","Gymnoscopelus"),"taxon")
+#'
+#'   x <- so_diet()
+#'   x %>% filter_by_name("Electrona carlsbergi",name_type="predator")
+#'   ## equivalent to
+#'   x %>% filter_by_predator_name("Electrona carlsbergi")
 #' }
 #'
 #' @export
@@ -54,6 +61,15 @@ filter_by_name <- function(x,name,name_type) {
     flt <- paste(flt,collapse=" | ")
     x %>% filter_(flt)
 }
+
+
+#' @rdname filter_by_name
+#' @export
+filter_by_predator_name <- function(x,name) filter_by_name(x,name,name_type="predator")
+
+#' @rdname filter_by_name
+#' @export
+filter_by_prey_name <- function(x,name) filter_by_name(x,name,name_type="prey")
 
 #' Filter out diet data below a given importance threshold
 #'

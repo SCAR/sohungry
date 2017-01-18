@@ -2,9 +2,15 @@
 % Please edit documentation in R/filter.R
 \name{filter_by_name}
 \alias{filter_by_name}
+\alias{filter_by_predator_name}
+\alias{filter_by_prey_name}
 \title{Filter data by predator, prey, or taxon name}
 \usage{
 filter_by_name(x, name, name_type)
+
+filter_by_predator_name(x, name)
+
+filter_by_prey_name(x, name)
 }
 \arguments{
 \item{x}{data.frame: diet data as returned by e.g. \code{so_diet} or \code{so_isotopes}}
@@ -18,11 +24,18 @@ data.frame
 }
 \description{
 A convenience function that matches on the species and/or group names.
+\code{filter_by_predator_name} is a convenience shorthand for \code{filter_by_name(...,name_type="predator")}
+\code{filter_by_prey_name} is a convenience shorthand for \code{filter_by_name(...,name_type="prey")}
 }
 \examples{
 \dontrun{
   x <- so_isotopes()
   x \%>\% filter_by_name(c("Electrona","Gymnoscopelus"),"taxon")
+
+  x <- so_diet()
+  x \%>\% filter_by_name("Electrona carlsbergi",name_type="predator")
+  ## equivalent to
+  x \%>\% filter_by_predator_name("Electrona carlsbergi")
 }
 
 }

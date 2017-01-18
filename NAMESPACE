@@ -3,6 +3,8 @@
 export(diet_summary)
 export(filter_by_importance)
 export(filter_by_name)
+export(filter_by_predator_name)
+export(filter_by_prey_name)
 export(replace_by_importance)
 export(replace_trace_values)
 export(so_diet)
