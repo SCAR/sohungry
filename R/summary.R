@@ -39,9 +39,9 @@ diet_summary <- function(x,summary_type="prey",minimum_importance=0,treat_trace_
     summary_type <- match.arg(tolower(summary_type),c("prey","predators"))
     ## rename appropriate col to "group"
     if (summary_type=="prey") {
-        out <- x %>% mutate_(group=~prey_group_name)
+        out <- x %>% mutate_(group=~prey_group_soki)
     } else {
-        out <- x %>% mutate_(group=~predator_group_name)
+        out <- x %>% mutate_(group=~predator_group_soki)
     }
     ## deal with trace values before aggregation
     out <- out %>% replace_trace_values(treat_trace_values_as)

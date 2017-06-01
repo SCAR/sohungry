@@ -8,7 +8,7 @@ so_isotopes(method = "get", cache_directory, refresh_cache = FALSE,
   public_only = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{method}{string: "get" (fetch the data via a web GET call) or "direct" (direct ODBC database connection, for internal AAD use only)}
+\item{method}{string: "get" (fetch the data via a web GET call) or "direct" (direct ODBC database connection, for internal AAD use only. Note that direct does not include some columns, notably worms taxonomic info)}
 
 \item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old}
 

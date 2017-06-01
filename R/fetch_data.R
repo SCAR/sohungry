@@ -28,9 +28,11 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         on.exit(try(aadcdb::db_close(dbh),silent=TRUE))
         where_string <- if (public_only) " where is_public_flag='Y'" else ""
         dbh <- aadcdb::db_open()
-        x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_table,where_string)) %>% select_(quote(-geometrypoint))
+        x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_table,where_string))
+        if ("geometry_point" %in% names(x)) x <- x %>% select_(quote(-geometrypoint)) ## backwards compat
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
-        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_sources_table)) %>% rename_(source_id=~ref_id)
+        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_sources_table))
+        if ("ref_id" %in% names(xs)) xs <- xs %>% rename_(source_id=~ref_id)
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
         suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
@@ -49,7 +51,7 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
 #' SCAR Southern Ocean Diet and Energetics isotope data
 #'
 #' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct ODBC database connection, for internal AAD use only)
+#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct ODBC database connection, for internal AAD use only. Note that direct does not include some columns, notably worms taxonomic info)
 #' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old
 #' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached copy will be used
 #' @param public_only logical: only applicable to \code{method} "direct"
