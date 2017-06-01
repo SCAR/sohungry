@@ -127,7 +127,9 @@ soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {
         ## fetch data if needed
         if (!use_cache) {
             if (verbose) cat("downloading data file from ",download_url," to ",local_file_name," ...")
-            curl_download(download_url,destfile=local_file_name,quiet=!verbose,mode="wb")
+            chand <- new_handle()
+            handle_setopt(chand,ssl_verifypeer=0) ## temporarily, to avoid issues with AAD certs
+            curl_download(download_url,destfile=local_file_name,quiet=!verbose,mode="wb",handle=chand)
             if (verbose) cat("done.\n")
         }
         ## unzip
