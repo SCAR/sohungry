@@ -99,7 +99,7 @@ soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {
         use_cache <- FALSE ## use cached copy without re-retrieving
         local_file_name <- "soded_data.zip"
 
-        download_url <- "http://data.aad.gov.au/database/trophic/scar_dump.zip" ## temporary location, will be moved to registered AADC download file
+        download_url <- "http://data.aad.gov.au/database/trophic/scar_dump_v2.zip" ## temporary location, will be moved to registered AADC download file
         if (!missing(cache_directory)) {
             assert_that(is.string(cache_directory))
             if (!dir.exists(cache_directory)) {
