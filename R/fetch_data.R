@@ -78,6 +78,7 @@ so_isotopes <- function(method="get",cache_directory,refresh_cache=FALSE,public_
         dbh <- aadcdb::db_open()
         x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$isotopes_table,where_string))
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
+        if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% rename_(taxon_group_soki=~taxon_group)
         xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$isotopes_sources_table))
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
