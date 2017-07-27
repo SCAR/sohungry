@@ -33,4 +33,3 @@ Replace diet data entries below a given importance threshold
 \seealso{
 \code{\link{so_diet}} \code{\link{filter_by_importance}}
 }
-

@@ -30,4 +30,3 @@ Records with all-NA importance values will be removed.
 \seealso{
 \code{\link{so_diet}}, \code{\link{replace_by_importance}}
 }
-

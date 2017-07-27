@@ -42,4 +42,3 @@ A convenience function that matches on the species and/or group names.
 \seealso{
 \code{\link{so_diet}}, \code{\link{so_isotopes}}
 }
-

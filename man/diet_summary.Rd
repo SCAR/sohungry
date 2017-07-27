@@ -47,4 +47,3 @@ study of 100 individuals will carry the same weight as a study of one individual
 }
 
 }
-

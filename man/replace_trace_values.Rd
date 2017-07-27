@@ -28,4 +28,3 @@ This function replaces those entries with the nominated numeric value.
 \seealso{
 \code{\link{so_diet}}
 }
-

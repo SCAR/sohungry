@@ -34,4 +34,3 @@ SCAR Southern Ocean Diet and Energetics diet data
 \references{
 \url{http://data.aad.gov.au/trophic/}
 }
-
