@@ -92,48 +92,49 @@ so_isotopes <- function(method="get",cache_directory,refresh_cache=FALSE,public_
 
 ## internal function to retrieve the zipped data file and unpack it
 soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {
-        ## fetch via GET, with local caching support
-        unzipped_data_dir <- tempfile(pattern="soded_")
-        dir.create(unzipped_data_dir)
-        if (!dir.exists(unzipped_data_dir)) stop("could not create temporary data directory")
+    ## fetch via GET, with local caching support
+    unzipped_data_dir <- tempfile(pattern="soded_")
+    dir.create(unzipped_data_dir)
+    if (!dir.exists(unzipped_data_dir)) stop("could not create temporary data directory")
 
-        use_cache <- FALSE ## use cached copy without re-retrieving
-        local_file_name <- "soded_data.zip"
+    use_cache <- FALSE ## use cached copy without re-retrieving
+    local_file_name <- "soded_data.zip"
 
-        download_url <- "http://data.aad.gov.au/database/trophic/scar_dump_v2.zip" ## temporary location, will be moved to registered AADC download file
-        if (!missing(cache_directory)) {
-            assert_that(is.string(cache_directory))
-            if (!dir.exists(cache_directory)) {
-                if (verbose) cat("creating data cache directory: ",cache_directory,"\n")
-                ok <- dir.create(cache_directory)
-                if (!ok) stop("could not create cache directory: ",cache_directory)
-            } else {
-                ## cache dir exists
-                use_cache <- TRUE
-                temp <- file.path(cache_directory,local_file_name)
-                ## but don't use_cache if we are refreshing it, or if the file doesn't exist
-                if (refresh_cache || !file.exists(temp)) use_cache <- FALSE
-                ## is cached copy old?
-                if (file.exists(temp)) {
-                    if (difftime(Sys.time(),file.info(temp)$mtime,units="days")>30)
-                        warning("cached copy of data is more than 30 days old, consider refreshing your copy")
-                }
-            }
+    download_url <- "http://data.aad.gov.au/database/trophic/scar_dump_v2.zip" ## temporary location, will be moved to registered AADC download file or geoserver endpoint
+    ## http://data.aad.gov.au/geoserver/aadc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=aadc:TROPHIC_DIET&maxFeatures=100000&outputFormat=csv
+    if (!missing(cache_directory)) {
+        assert_that(is.string(cache_directory))
+        if (!dir.exists(cache_directory)) {
+            if (verbose) cat("creating data cache directory: ",cache_directory,"\n")
+            ok <- dir.create(cache_directory)
+            if (!ok) stop("could not create cache directory: ",cache_directory)
         } else {
-            ## save to tempdir
-            cache_directory <- tempdir()
+            ## cache dir exists
+            use_cache <- TRUE
+            temp <- file.path(cache_directory,local_file_name)
+            ## but don't use_cache if we are refreshing it, or if the file doesn't exist
+            if (refresh_cache || !file.exists(temp)) use_cache <- FALSE
+            ## is cached copy old?
+            if (file.exists(temp)) {
+                if (difftime(Sys.time(),file.info(temp)$mtime,units="days")>30)
+                    warning("cached copy of data is more than 30 days old, consider refreshing your copy")
+            }
         }
-        local_file_name <- file.path(cache_directory,local_file_name)
-        ## fetch data if needed
-        if (!use_cache) {
-            if (verbose) cat("downloading data file from ",download_url," to ",local_file_name," ...")
-            chand <- new_handle()
-            handle_setopt(chand,ssl_verifypeer=0) ## temporarily, to avoid issues with AAD certs
-            curl_download(download_url,destfile=local_file_name,quiet=!verbose,mode="wb",handle=chand)
-            if (verbose) cat("done.\n")
-        }
-        ## unzip
-        unzip(local_file_name,exdir=unzipped_data_dir)
-        unzipped_data_dir
+    } else {
+        ## save to tempdir
+        cache_directory <- tempdir()
+    }
+    local_file_name <- file.path(cache_directory,local_file_name)
+    ## fetch data if needed
+    if (!use_cache) {
+        if (verbose) cat("downloading data file from ",download_url," to ",local_file_name," ...")
+        chand <- new_handle()
+        handle_setopt(chand,ssl_verifypeer=0) ## temporarily, to avoid issues with AAD certs
+        curl_download(download_url,destfile=local_file_name,quiet=!verbose,mode="wb",handle=chand)
+        if (verbose) cat("done.\n")
+    }
+    ## unzip
+    unzip(local_file_name,exdir=unzipped_data_dir)
+    unzipped_data_dir
 }
 
