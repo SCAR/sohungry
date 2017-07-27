@@ -22,9 +22,9 @@ so_allometry_cephalopods <- function(taxon_name,aphia_id,LRL) {
     } else {
         stop("need taxon_name or aphia_id")
     }
-    idx <- which(idx & allometry_data$input=="lower rostral length")
+    idx <- which(idx & allometry_data$input_measurement=="lower rostral length")
     lapply(LRL,function(z) {
-        bind_cols(tibble(LRL=z,
+        bind_cols(tibble(input=z,
                          value=sapply(idx,function(i)allometry_data$equation[[i]](z))),
                   allometry_data[idx,])
     })
