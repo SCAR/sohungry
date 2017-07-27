@@ -1,6 +1,6 @@
 #' Allometric equations for cephalopods
 #'
-#' Estimate body size (currently mantle length and/or body mass) from lower rostral length.
+#' Estimate body size measurements (currently mantle length and/or body mass) from lower rostral length.
 #' Either the taxon name or the aphia ID must be provided.
 #'
 #' @param taxon_name string: the name of the taxon

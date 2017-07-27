@@ -17,7 +17,7 @@ so_allometry_cephalopods(taxon_name, aphia_id, LRL)
 list of data.frames, one per supplied lower rostral length value
 }
 \description{
-Estimate body size (currently mantle length and/or body mass) from lower rostral length.
+Estimate body size measurements (currently mantle length and/or body mass) from lower rostral length.
 Either the taxon name or the aphia ID must be provided.
 }
 \examples{
