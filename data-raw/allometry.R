@@ -53,4 +53,4 @@ build_allometry_df <- function() {
 }
 
 allometry_data <- build_allometry_df()
-use_data(allometry_data,internal=TRUE,overwrite=TRUE)
+use_data(allometry_data,internal=FALSE,overwrite=TRUE)

@@ -1,3 +1,5 @@
+globalVariables("allometry_data") # To make R CMD Check happy
+
 #' Allometric equations for cephalopods
 #'
 #' Estimate body size measurements (currently mantle length and/or body mass) from lower rostral length.
