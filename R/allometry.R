@@ -4,12 +4,16 @@ globalVariables("allometry_data") # To make R CMD Check happy
 #'
 #' Estimate body size measurements (currently mantle length and/or body mass) from lower rostral length.
 #' Either the taxon name or the aphia ID must be provided.
+#' Note that some allometric equations apply at the genus- or family-level. Currently these won't be found if a species
+#' name or ID is provided here. Refer to \code{\link{allometry_data}} to see all available equations.
 #'
 #' @param taxon_name string: the name of the taxon
 #' @param aphia_id numeric: the aphia ID of the taxon
 #' @param LRL numeric: one or more lower rostral lengths (in mm)
 #'
 #' @return list of data.frames, one per supplied lower rostral length value
+#'
+#' @seealso \code{\link{allometry_data}}
 #'
 #' @examples
 #' so_allometry_cephalopods(taxon_name="Architeuthis dux",
@@ -31,6 +35,3 @@ so_allometry_cephalopods <- function(taxon_name,aphia_id,LRL) {
                   allometry_data[idx,])
     })
 }
-
-
-

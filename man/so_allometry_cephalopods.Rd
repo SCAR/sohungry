@@ -19,9 +19,14 @@ list of data.frames, one per supplied lower rostral length value
 \description{
 Estimate body size measurements (currently mantle length and/or body mass) from lower rostral length.
 Either the taxon name or the aphia ID must be provided.
+Note that some allometric equations apply at the genus- or family-level. Currently these won't be found if a species
+name or ID is provided here. Refer to \code{\link{allometry_data}} to see all available equations.
 }
 \examples{
 so_allometry_cephalopods(taxon_name="Architeuthis dux",
   LRL=c(13.9,11.3))
 
+}
+\seealso{
+\code{\link{allometry_data}}
 }
