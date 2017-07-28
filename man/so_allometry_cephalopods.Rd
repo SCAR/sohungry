@@ -4,12 +4,12 @@
 \alias{so_allometry_cephalopods}
 \title{Allometric equations for cephalopods}
 \usage{
-so_allometry_cephalopods(taxon_name, aphia_id, LRL)
+so_allometry_cephalopods(taxon_name, taxon_aphia_id, LRL)
 }
 \arguments{
 \item{taxon_name}{string: the name of the taxon}
 
-\item{aphia_id}{numeric: the aphia ID of the taxon}
+\item{taxon_aphia_id}{numeric: the Aphia ID of the taxon}
 
 \item{LRL}{numeric: one or more lower rostral lengths (in mm)}
 }
@@ -18,7 +18,7 @@ list of data.frames, one per supplied lower rostral length value
 }
 \description{
 Estimate body size measurements (currently mantle length and/or body mass) from lower rostral length.
-Either the taxon name or the aphia ID must be provided.
+Either the taxon name or the Aphia ID must be provided.
 Note that some allometric equations apply at the genus- or family-level. Currently these won't be found if a species
 name or ID is provided here. Refer to \code{\link{allometry_data}} to see all available equations.
 }
