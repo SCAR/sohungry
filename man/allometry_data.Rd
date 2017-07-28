@@ -6,6 +6,7 @@
 \title{Allometric equation data.}
 \format{A data frame with variables:
 \describe{
+  \item{equation_id}{the identifier of this equation}
   \item{taxon_name}{name of the taxon}
   \item{taxon_aphia_id}{the Aphia ID of the taxon (identifier within the World Register of Marine Species)}
   \item{equation}{a function encoding the allometric equation}
