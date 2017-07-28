@@ -6,7 +6,7 @@
 #' @format A data frame with variables:
 #' \describe{
 #'   \item{taxon_name}{name of the taxon}
-#'   \item{aphia_id}{the Aphia ID of the taxon (identifier within the World Register of Marine Species)}
+#'   \item{taxon_aphia_id}{the Aphia ID of the taxon (identifier within the World Register of Marine Species)}
 #'   \item{equation}{a function encoding the allometric equation}
 #'   \item{input_measurement}{the name of the measurement needed}
 #'   \item{return_measurement}{the name of the body size characteristic that is estimated by this equation (e.g. 'mass')}
