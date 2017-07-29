@@ -4,12 +4,14 @@
 \alias{so_allometry_cephalopods}
 \title{Allometric equations for cephalopods}
 \usage{
-so_allometry_cephalopods(taxon_name, taxon_aphia_id, LRL)
+so_allometry_cephalopods(taxon_name, taxon_aphia_id, equation_id, LRL)
 }
 \arguments{
 \item{taxon_name}{string: the name of the taxon}
 
 \item{taxon_aphia_id}{numeric: the Aphia ID of the taxon}
+
+\item{equation_id}{character: the identifier of the equation to apply}
 
 \item{LRL}{numeric: one or more lower rostral lengths (in mm)}
 }

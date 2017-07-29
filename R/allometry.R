@@ -9,6 +9,7 @@ globalVariables("allometry_data") # To make R CMD Check happy
 #'
 #' @param taxon_name string: the name of the taxon
 #' @param taxon_aphia_id numeric: the Aphia ID of the taxon
+#' @param equation_id character: the identifier of the equation to apply
 #' @param LRL numeric: one or more lower rostral lengths (in mm)
 #'
 #' @return list of data.frames, one per supplied lower rostral length value
@@ -20,14 +21,14 @@ globalVariables("allometry_data") # To make R CMD Check happy
 #'   LRL=c(13.9,11.3))
 #'
 #' @export
-so_allometry_cephalopods <- function(taxon_name,taxon_aphia_id,LRL) {
+so_allometry_cephalopods <- function(taxon_name,taxon_aphia_id,equation_id,LRL) {
+    idx <- if (!missing(equation_id)) allometry_data$equation_id==equation_id else rep(TRUE,nrow(allometry_data))
     if (!missing(taxon_name)) {
-        idx <- allometry_data$taxon_name==taxon_name
+        idx <- idx & allometry_data$taxon_name==taxon_name
     } else if (!missing(taxon_aphia_id)) {
-        idx <- allometry_data$taxon_aphia_id==taxon_aphia_id
-    } else {
-        stop("need taxon_name or taxon_aphia_id")
+        idx <- idx & allometry_data$taxon_aphia_id==taxon_aphia_id
     }
+    if (all(idx)) stop("need taxon_name or taxon_aphia_id, and/or equation_id")
     idx <- which(idx & allometry_data$input_measurement=="lower rostral length")
     lapply(LRL,function(z) {
         bind_cols(tibble(input=z,
