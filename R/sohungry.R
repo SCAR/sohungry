@@ -10,5 +10,5 @@
 #' @importFrom lubridate ymd_hms
 #' @importFrom readr read_csv
 #' @importFrom stats as.formula
-#' @importFrom utils globalVariables unzip
+#' @importFrom utils unzip
 NULL
