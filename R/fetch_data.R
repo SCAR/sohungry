@@ -42,8 +42,6 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         ## ensure dietary importance measures are numeric
         x <- x %>% mutate_(fraction_diet_by_weight=~as.numeric(fraction_diet_by_weight),fraction_diet_by_prey_items=~as.numeric(fraction_diet_by_prey_items),fraction_occurrence=~as.numeric(fraction_occurrence))
         suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$diet_sources_file)))
-        names(xs) <- tolower(names(xs))
-        xs$doi <- as.character(NA)
     }
     xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
     x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")

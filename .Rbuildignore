@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^README\.Rmd$
-^README-.*\.png$
+^README.html$
 ^\.travis\.yml$
 ^appveyor\.yml$
 data-raw
