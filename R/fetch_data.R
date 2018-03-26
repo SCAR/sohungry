@@ -1,7 +1,7 @@
 #' SCAR Southern Ocean Diet and Energetics diet data
 #'
 #' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct ODBC database connection, for internal AAD use only)
+#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)
 #' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old
 #' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached copy will be used
 #' @param public_only logical: only applicable to \code{method} "direct"
@@ -22,7 +22,7 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
     assert_that(is.flag(public_only))
     method <- match.arg(tolower(method),c("get","direct"))
     if (method=="direct") {
-        if (!requireNamespace("aadcdb", quietly = TRUE)) {
+        if (!requireNamespace("aadcdb", quietly=TRUE)) {
             stop("The aadcdb package is required for method=\"direct\"",call.=FALSE)
         }
         on.exit(try(aadcdb::db_close(dbh),silent=TRUE))
@@ -32,7 +32,7 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         if ("geometry_point" %in% names(x)) x <- x %>% select_(quote(-geometrypoint)) ## backwards compat
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_sources_table))
-        if ("ref_id" %in% names(xs)) xs <- xs %>% rename_(source_id=~ref_id)
+        if ("ref_id" %in% names(xs)) xs <- xs %>% dplyr::rename(source_id="ref_id")
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
         suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
@@ -45,13 +45,14 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         names(xs) <- tolower(names(xs))
         xs$doi <- as.character(NA)
     }
-    x %>% left_join(xs %>% select_("source_id",source_details=~details,source_doi=~doi),by="source_id")
+    xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
+    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
 }
 
 #' SCAR Southern Ocean Diet and Energetics isotope data
 #'
 #' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct ODBC database connection, for internal AAD use only. Note that direct does not include some columns, notably worms taxonomic info)
+#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably worms taxonomic info)
 #' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old
 #' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached copy will be used
 #' @param public_only logical: only applicable to \code{method} "direct"
@@ -64,13 +65,13 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
 #'   x <- so_isotopes(cache_dir="c:/temp/diet_cache")
 #' }
 #' @export
-so_isotopes <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
+so_isotopes <- function(method="get", cache_directory, refresh_cache=FALSE, public_only=TRUE, verbose=FALSE) {
     assert_that(is.string(method))
     assert_that(is.flag(refresh_cache))
     assert_that(is.flag(public_only))
-    method <- match.arg(tolower(method),c("get","direct"))
+    method <- match.arg(tolower(method), c("get","direct"))
     if (method=="direct") {
-        if (!requireNamespace("aadcdb", quietly = TRUE)) {
+        if (!requireNamespace("aadcdb", quietly=TRUE)) {
             stop("The aadcdb package is required for method=\"direct\"",call.=FALSE)
         }
         on.exit(try(aadcdb::db_close(dbh),silent=TRUE))
@@ -78,7 +79,7 @@ so_isotopes <- function(method="get",cache_directory,refresh_cache=FALSE,public_
         dbh <- aadcdb::db_open()
         x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$isotopes_table,where_string))
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
-        if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% rename_(taxon_group_soki=~taxon_group)
+        if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki="taxon_group")
         xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$isotopes_sources_table))
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
@@ -87,8 +88,52 @@ so_isotopes <- function(method="get",cache_directory,refresh_cache=FALSE,public_
         ##if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$isotopes_sources_file)))
     }
-    x %>% left_join(xs %>% select_("source_id",source_details=~details,source_doi=~doi),by="source_id")
+    xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
+    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
 }
+
+#' SCAR Southern Ocean Diet and Energetics energetics data
+#'
+#' @references \url{http://data.aad.gov.au/trophic/}
+#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably worms taxonomic info)
+#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old
+#' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached copy will be used
+#' @param public_only logical: only applicable to \code{method} "direct"
+#' @param verbose logical: show progress messages?
+#'
+#' @return data.frame
+#'
+#' @examples
+#' \dontrun{
+#'   x <- so_energetics(cache_dir="c:/temp/diet_cache")
+#' }
+#' @export
+so_energetics <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
+    assert_that(is.string(method))
+    assert_that(is.flag(refresh_cache))
+    assert_that(is.flag(public_only))
+    method <- match.arg(tolower(method),c("get","direct"))
+    if (method=="direct") {
+        if (!requireNamespace("aadcdb", quietly=TRUE)) {
+            stop("The aadcdb package is required for method=\"direct\"",call.=FALSE)
+        }
+        on.exit(try(aadcdb::db_close(dbh), silent=TRUE))
+        where_string <- if (public_only) " where is_public_flag='Y'" else ""
+        dbh <- aadcdb::db_open()
+        x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$energetics_table,where_string))
+        if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
+        if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki="taxon_group")
+        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$energetics_sources_table))
+    } else {
+        unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
+        suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
+        suppress(x <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$energetics_file)))
+        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$energetics_sources_file)))
+    }
+    xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
+    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
+}
+
 
 ## internal function to retrieve the zipped data file and unpack it
 soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {

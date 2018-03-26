@@ -59,9 +59,9 @@ diet_summary <- function(x,summary_type="prey",minimum_importance=0,treat_trace_
         filter_(~(fraction_diet_by_weight>0 | fraction_occurrence>0 | fraction_diet_by_prey_items>0) | (all_zero_count))
     ##last OR condition is special case: if all dietary importance measures are null for this group, we still want to show it
     if (summary_type=="prey") {
-        out %>% select_(quote(-all_zero_count)) %>% rename_(prey=~group)
+        out %>% select_(quote(-all_zero_count)) %>% dplyr::rename(prey="group")
     } else {
-        out %>% select_(quote(-all_zero_count)) %>% rename_(predator=~group)
+        out %>% select_(quote(-all_zero_count)) %>% dplyr::rename(predator="group")
     }
 }
 
