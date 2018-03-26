@@ -25,9 +25,15 @@ Usage
 ``` r
 library(sohungry)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
-Load the desired dataset using `so_isotopes()` or `so_diet()`. Note that these read the data from the server (or cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory. Load the stable isotope data:
+Load the desired dataset using `so_isotopes()`, `so_energetics()`, or `so_diet()`. Note that these read the data from the server (or local cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory.
+
+### Isotopes
+
+Load the stable isotope data:
 
 ``` r
 xi <- so_isotopes()
@@ -36,13 +42,15 @@ xi <- so_isotopes()
 Filter to taxon of interest:
 
 ``` r
-xi %>% filter(taxon_name=="Electrona carlsbergi") %>% select(delta_13c_mean,delta_15n_mean)
-#> # A tibble: 2 × 2
+xi %>% filter(taxon_name=="Electrona carlsbergi") %>% dplyr::select(delta_13c_mean,delta_15n_mean)
+#> # A tibble: 2 x 2
 #>   delta_13c_mean delta_15n_mean
 #>            <dbl>          <dbl>
-#> 1          -21.6            9.5
-#> 2          -21.6            9.5
+#> 1          -21.6           9.50
+#> 2          -21.6           9.50
 ```
+
+### Diet
 
 Load the diet data (stomach content analyses and similar):
 
@@ -54,23 +62,22 @@ A summary of what *Electrona carlsbergi* eats:
 
 ``` r
 x %>% filter_by_predator_name("Electrona carlsbergi") %>% diet_summary(summary_type="prey")
-#> # A tibble: 12 × 7
-#>                                          prey fraction_diet_by_weight
-#>                                         <chr>                   <dbl>
-#> 1  <i>Euphausia superba</i> (Antarctic krill)                     NaN
-#> 2                  Chaetognatha (arrow worms)               0.0970000
-#> 3                         Copepoda (copepods)                     NaN
-#> 4                     Crustacea (crustaceans)               0.1100000
-#> 5                   Euphausiids (other krill)               0.3222377
-#> 6                                        Fish               0.1230000
-#> 7                             Heterorhabdidae                     NaN
-#> 8             Hyperiidea (hyperiid amphipods)               0.4098361
-#> 9         Malacostraca (class of crustaceans)               0.0134959
-#> 10         Maxillopoda (class of crustaceans)               0.0420000
-#> 11                                      Salps                     NaN
-#> 12                        Uncategorized group               0.3840000
-#> # ... with 5 more variables: N_fraction_diet_by_weight <int>,
-#> #   fraction_occurrence <dbl>, N_fraction_occurrence <int>,
+#> # A tibble: 12 x 7
+#>    prey            fraction_diet_by_~ N_fraction_diet_by~ fraction_occurr~
+#>    <chr>                        <dbl>               <int>            <dbl>
+#>  1 <i>Euphausia s~           NaN                        0          0.0190 
+#>  2 Chaetognatha (~             0.0970                   1        NaN      
+#>  3 Copepoda (cope~           NaN                        0          0.0483 
+#>  4 Crustacea (cru~             0.110                    1          0.411  
+#>  5 Euphausiids (o~             0.322                    1          0.0977 
+#>  6 Fish                        0.123                    1        NaN      
+#>  7 Heterorhabdidae           NaN                        0          0.00630
+#>  8 Hyperiidea (hy~             0.410                    1          0.204  
+#>  9 Malacostraca (~             0.0135                   1          0.200  
+#> 10 Maxillopoda (c~             0.0420                   1          0.104  
+#> 11 Salps                     NaN                        0          0.202  
+#> 12 Uncategorized ~             0.384                    1          0.411  
+#> # ... with 3 more variables: N_fraction_occurrence <int>,
 #> #   fraction_diet_by_prey_items <dbl>, N_fraction_diet_by_prey_items <int>
 ```
 
@@ -78,25 +85,86 @@ And what eats *Electrona carlsbergi*:
 
 ``` r
 x %>% filter_by_prey_name("Electrona carlsbergi") %>% diet_summary(summary_type="predators")
-#> # A tibble: 14 × 7
-#>                                                            predator
-#>                                                               <chr>
-#> 1                     <i>Aptenodytes patagonicus</i> (king penguin)
-#> 2  <i>Arctocephalus</i> spp. (Antarctic and subantarctic fur seals)
-#> 3                 <i>Champsocephalus gunnari</i> (mackerel icefish)
-#> 4                              <i>Dissostichus</i> spp. (toothfish)
-#> 5                   <i>Eudyptes chrysocome</i> (rockhopper penguin)
-#> 6                   <i>Eudyptes chrysolophus</i> (Macaroni penguin)
-#> 7                         <i>Eudyptes schlegeli</i> (royal penguin)
-#> 8                 <i>Mirounga leonina</i> (southern elephant seals)
-#> 9                          <i>Pygoscelis papua</i> (gentoo penguin)
-#> 10                                        Diomedeidae (albatrosses)
-#> 11                                   Onychoteuthidae (hooked squid)
-#> 12                                          Otariidae (eared seals)
-#> 13                                   Phalacrocoracidae (cormorants)
-#> 14                           Procellariidae (procellariid seabirds)
-#> # ... with 6 more variables: fraction_diet_by_weight <dbl>,
-#> #   N_fraction_diet_by_weight <int>, fraction_occurrence <dbl>,
-#> #   N_fraction_occurrence <int>, fraction_diet_by_prey_items <dbl>,
-#> #   N_fraction_diet_by_prey_items <int>
+#> # A tibble: 14 x 7
+#>    predator          fraction_diet_by_~ N_fraction_diet_~ fraction_occurr~
+#>    <chr>                          <dbl>             <int>            <dbl>
+#>  1 <i>Aptenodytes p~            0.0750                  1          0.236  
+#>  2 <i>Arctocephalus~            0.00331                 1          0.0503 
+#>  3 <i>Champsocephal~          NaN                       0          0.00213
+#>  4 <i>Dissostichus<~          NaN                       0          0.00710
+#>  5 <i>Eudyptes chry~          NaN                       0          0.0540 
+#>  6 <i>Eudyptes chry~          NaN                       0          0.0630 
+#>  7 <i>Eudyptes schl~            0.0964                  1          0.204  
+#>  8 <i>Mirounga leon~          NaN                       0          0.0920 
+#>  9 <i>Pygoscelis pa~            0.275                   1          0.184  
+#> 10 Diomedeidae (alb~            0                       1          0.0318 
+#> 11 Onychoteuthidae ~            0.0660                  1          0.153  
+#> 12 Otariidae (eared~          NaN                       0          0.0420 
+#> 13 Phalacrocoracida~          NaN                       0          0.00900
+#> 14 Procellariidae (~            0.0126                  1          0.0824 
+#> # ... with 3 more variables: N_fraction_occurrence <int>,
+#> #   fraction_diet_by_prey_items <dbl>, N_fraction_diet_by_prey_items <int>
 ```
+
+### Energetics
+
+``` r
+xe <- so_energetics()
+```
+
+Select all single-individual records of *Electrona antarctica*:
+
+``` r
+edx <- xe %>% filter(taxon_sample_count==1 & taxon_name=="Electrona antarctica")
+
+## discard the dry-weight energy density values
+edx <- edx %>% filter(measurement_units!="kJ/gDW")
+
+## some data manipulation
+edx <- edx %>%
+  ## remove the spaces from the measurement names, for convenience
+  mutate(measurement_name=gsub("[[:space:]]+", "_", measurement_name)) %>%
+  ## convert to wide format
+  dplyr::select(source_id, taxon_sample_id, measurement_name, measurement_mean_value) %>%
+  tidyr::spread(measurement_name, measurement_mean_value)
+
+## what does this look like?
+edx
+#> # A tibble: 197 x 8
+#>    source_id taxon_sample_id dry_weight energy_content standard_length
+#>  *     <int>           <int>      <dbl>          <dbl>           <dbl>
+#>  1        64              37    1.20              8.64            70.0
+#>  2        64              38    0.00670           5.34            15.0
+#>  3        64              39    0.00675           4.51            16.0
+#>  4        64              40    0.600             6.79            58.0
+#>  5        64              41    0.307             7.84            47.0
+#>  6        64              42    0.498             8.35            56.0
+#>  7        64              43    1.52              8.73            77.0
+#>  8        64              44    2.87              9.38            90.0
+#>  9        64              47    0.0890            3.76            37.0
+#> 10        64              48    0.396             7.12            53.0
+#> # ... with 187 more rows, and 3 more variables: total_length <dbl>,
+#> #   water_content <dbl>, wet_weight <dbl>
+```
+
+Plot the wet weight against wet-weight energy density:
+
+``` r
+p <- ggplot(edx, aes(wet_weight, energy_content))+geom_point()+theme_bw()+
+  labs(x="Wet weight (g)", y="Energy density (kJ/g wet weight)")
+print(p)
+```
+
+![](vignettes/README-ea_plot1-1.png)
+
+Fit an allometric equation:
+
+``` r
+fit <- lm(log(energy_content)~log(wet_weight), data=edx)
+px <- tibble(wet_weight=seq(from=min(edx$wet_weight), to=max(edx$wet_weight), length.out=51))
+px$energy_content <- exp(predict(fit, newdata=px))
+p <- p+geom_path(data=px, colour="dodgerblue")
+print(p)
+```
+
+![](vignettes/README-ea_plot2-1.png)

@@ -4,11 +4,13 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE}
+```{r echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "README-"
+  fig.path = "vignettes/README-",
+  fig.width = 10,
+  fig.height = 4
 )
 ```
 
@@ -26,7 +28,7 @@ This R package provides access to the SCAR Southern Ocean Diet and Energetics Da
 Installing
 ----------
 
-```{r, eval=FALSE}
+```{r eval=FALSE}
 install.packages("devtools")
 library(devtools)
 install_github("SCAR/sohungry")
@@ -35,33 +37,86 @@ install_github("SCAR/sohungry")
 Usage
 -----
 
-```{r, message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 library(sohungry)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
-Load the desired dataset using `so_isotopes()` or `so_diet()`. Note that these read the data from the server (or cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory.
+Load the desired dataset using `so_isotopes()`, `so_energetics()`, or `so_diet()`. Note that these read the data from the server (or local cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory.
+
+### Isotopes
+
 Load the stable isotope data:
-```{r, message=FALSE}
+```{r message=FALSE}
 xi <- so_isotopes()
 ```
 
 Filter to taxon of interest:
-```{r, message=FALSE}
-xi %>% filter(taxon_name=="Electrona carlsbergi") %>% select(delta_13c_mean,delta_15n_mean)
+```{r message=FALSE}
+xi %>% filter(taxon_name=="Electrona carlsbergi") %>% dplyr::select(delta_13c_mean,delta_15n_mean)
 ```
 
+### Diet
+
 Load the diet data (stomach content analyses and similar):
-```{r, message=FALSE}
+```{r message=FALSE}
 x <- so_diet()
 ```
 
 A summary of what *Electrona carlsbergi* eats:
-```{r, message=FALSE}
+```{r message=FALSE}
 x %>% filter_by_predator_name("Electrona carlsbergi") %>% diet_summary(summary_type="prey")
 ```
 
 And what eats *Electrona carlsbergi*:
-```{r, message=FALSE}
+```{r message=FALSE}
 x %>% filter_by_prey_name("Electrona carlsbergi") %>% diet_summary(summary_type="predators")
 ```
+
+### Energetics
+
+```{r message=FALSE}
+xe <- so_energetics()
+```
+
+Select all single-individual records of *Electrona antarctica*:
+
+```{r message=FALSE}
+edx <- xe %>% filter(taxon_sample_count==1 & taxon_name=="Electrona antarctica")
+
+## discard the dry-weight energy density values
+edx <- edx %>% filter(measurement_units!="kJ/gDW")
+
+## some data manipulation
+edx <- edx %>%
+  ## remove the spaces from the measurement names, for convenience
+  mutate(measurement_name=gsub("[[:space:]]+", "_", measurement_name)) %>%
+  ## convert to wide format
+  dplyr::select(source_id, taxon_sample_id, measurement_name, measurement_mean_value) %>%
+  tidyr::spread(measurement_name, measurement_mean_value)
+
+## what does this look like?
+edx
+```
+
+Plot the wet weight against wet-weight energy density:
+
+```{r ea_plot1, message=FALSE}
+p <- ggplot(edx, aes(wet_weight, energy_content))+geom_point()+theme_bw()+
+  labs(x="Wet weight (g)", y="Energy density (kJ/g wet weight)")
+print(p)
+```
+
+Fit an allometric equation:
+
+```{r ea_plot2, message=FALSE}
+fit <- lm(log(energy_content)~log(wet_weight), data=edx)
+px <- tibble(wet_weight=seq(from=min(edx$wet_weight), to=max(edx$wet_weight), length.out=51))
+px$energy_content <- exp(predict(fit, newdata=px))
+p <- p+geom_path(data=px, colour="dodgerblue")
+print(p)
+```
+
+
