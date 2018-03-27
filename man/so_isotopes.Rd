@@ -8,11 +8,11 @@ so_isotopes(method = "get", cache_directory, refresh_cache = FALSE,
   public_only = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{method}{string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably worms taxonomic info)}
+\item{method}{string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably WoRMS taxonomic info)}
 
-\item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old}
+\item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary}
 
-\item{refresh_cache}{logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached copy will be used}
+\item{refresh_cache}{logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used}
 
 \item{public_only}{logical: only applicable to \code{method} "direct"}
 
