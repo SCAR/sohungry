@@ -1,6 +1,5 @@
 .onLoad <- function(libname,pkgname) {
     ## populate the options slot
-    cachedir <- file.path(tempdir(),"sohungry")
     this_options <- list(
         sources_table="ecology.dbo.scar_references",
         sources_file="scar_sources.csv",
@@ -10,9 +9,11 @@
         isotopes_file="scar_isotopes.csv",
         diet_table="ecology.dbo.scar_diet",
         diet_file="scar_diet.csv",
+        dna_diet_table="ecology.dbo.scar_dna_diet",
+        dna_diet_file="scar_dna_diet.csv",
         lipids_table="ecology.dbo.scar_lipids",
         lipids_file="scar_lipids.csv",
-        cache_dir=cachedir
+        session_cache_dir=tempfile(pattern="sohungry_")
     )
     options(list(sohungry=this_options))
     invisible()
