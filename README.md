@@ -8,10 +8,9 @@ sohungry
 Overview
 --------
 
-This R package provides access to the SCAR Southern Ocean Diet and Energetics Database: see <http://data.aad.gov.au/trophic/>.
+This R package provides access to the SCAR Southern Ocean Diet and Energetics Database, and some tools for working with these data. For more information about the database see <http://data.aad.gov.au/trophic/>.
 
-Installing
-----------
+### Installing
 
 ``` r
 install.packages("devtools")
@@ -22,14 +21,14 @@ install_github("SCAR/sohungry")
 Usage
 -----
 
+Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, or `so_diet()`.
+
 ``` r
 library(sohungry)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 ```
-
-Load the desired dataset using `so_isotopes()`, `so_energetics()`, or `so_diet()`. Note that these read the data from the server (or local cache, depending on caching settings). For fastest performance should probably be called once per session and kept in memory.
 
 ### Isotopes
 
@@ -152,7 +151,7 @@ Plot the wet weight against wet-weight energy density:
 ``` r
 p <- ggplot(edx, aes(wet_weight, energy_content))+geom_point()+theme_bw()+
   labs(x="Wet weight (g)", y="Energy density (kJ/g wet weight)")
-print(p)
+plot(p)
 ```
 
 ![](vignettes/README-ea_plot1-1.png)
@@ -163,8 +162,27 @@ Fit an allometric equation:
 fit <- lm(log(energy_content)~log(wet_weight), data=edx)
 px <- tibble(wet_weight=seq(from=min(edx$wet_weight), to=max(edx$wet_weight), length.out=51))
 px$energy_content <- exp(predict(fit, newdata=px))
-p <- p+geom_path(data=px, colour="dodgerblue")
-print(p)
+p+geom_path(data=px, colour="dodgerblue")
 ```
 
 ![](vignettes/README-ea_plot2-1.png)
+
+### Lipids and fatty acids
+
+``` r
+xl <- so_lipids()
+```
+
+Select lipid-class data from Connan et al. (2007), and plot similar to Figure 2 from that paper:
+
+``` r
+xl <- xl %>% dplyr::filter(source_id==126 & measurement_class=="lipid class") %>%
+  mutate(measurement_name=sub(" content", "", measurement_name)) ## tidy the names a little
+
+ggplot(xl,
+  aes(measurement_name, measurement_mean_value, fill=taxon_life_stage, group=taxon_life_stage))+
+  geom_col(position="dodge")+theme_bw()+
+  labs(x="Lipid class", y="Percentage of lipids")
+```
+
+![](vignettes/README-lip_plot1-1.png)
