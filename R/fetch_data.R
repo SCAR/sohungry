@@ -31,7 +31,7 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_table,where_string))
         if ("geometry_point" %in% names(x)) x <- x %>% select_(quote(-geometrypoint)) ## backwards compat
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
-        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$diet_sources_table))
+        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$sources_table))
         if ("ref_id" %in% names(xs)) xs <- xs %>% dplyr::rename(source_id="ref_id")
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
@@ -41,7 +41,7 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
         ##if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         ## ensure dietary importance measures are numeric
         x <- x %>% mutate_(fraction_diet_by_weight=~as.numeric(fraction_diet_by_weight),fraction_diet_by_prey_items=~as.numeric(fraction_diet_by_prey_items),fraction_occurrence=~as.numeric(fraction_occurrence))
-        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$diet_sources_file)))
+        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$sources_file)))
     }
     xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
     x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
@@ -78,13 +78,13 @@ so_isotopes <- function(method="get", cache_directory, refresh_cache=FALSE, publ
         x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$isotopes_table,where_string))
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki="taxon_group")
-        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$isotopes_sources_table))
+        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$sources_table))
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
         suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
         suppress(x <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$isotopes_file)))
         ##if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
-        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$isotopes_sources_file)))
+        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$sources_file)))
     }
     xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
     x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
@@ -121,12 +121,12 @@ so_energetics <- function(method="get",cache_directory,refresh_cache=FALSE,publi
         x <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$energetics_table,where_string))
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki="taxon_group")
-        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$energetics_sources_table))
+        xs <- aadcdb::db_query(dbh,paste0("select * from ",getOption("sohungry")$sources_table))
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
         suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
         suppress(x <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$energetics_file)))
-        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$energetics_sources_file)))
+        suppress(xs <- read_csv(file.path(unzipped_data_dir,getOption("sohungry")$sources_file)))
     }
     xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
     x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
