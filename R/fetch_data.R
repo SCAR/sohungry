@@ -212,7 +212,8 @@ soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {
     if (!use_existing_zip) {
         if (verbose) message("downloading data file from ",download_url," to ",zip_file_name," ...")
         chand <- new_handle()
-        handle_setopt(chand,ssl_verifypeer=0) ## temporarily, to avoid issues with AAD certs
+        handle_setopt(chand, ssl_verifypeer=0) ## temporarily, to avoid issues with AAD certs
+        handle_setheaders(chand, "Cache-Control"="no-cache") ## no server-side caching please
         curl_download(download_url,destfile=zip_file_name,quiet=!verbose,mode="wb",handle=chand)
         do_unzip <- TRUE
     } else {
