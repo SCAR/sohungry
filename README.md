@@ -21,7 +21,7 @@ install_github("SCAR/sohungry")
 Usage
 -----
 
-Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, or `so_diet()`.
+Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, `so_dna_diet()`, or `so_diet()`.
 
 ``` r
 library(sohungry)
@@ -131,7 +131,7 @@ edx <- edx %>%
 edx
 #> # A tibble: 197 x 8
 #>    source_id taxon_sample_id dry_weight energy_content standard_length
-#>  *     <int>           <int>      <dbl>          <dbl>           <dbl>
+#>        <int>           <int>      <dbl>          <dbl>           <dbl>
 #>  1        64              37    1.20              8.64            70.0
 #>  2        64              38    0.00670           5.34            15.0
 #>  3        64              39    0.00675           4.51            16.0

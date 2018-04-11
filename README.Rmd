@@ -34,7 +34,7 @@ install_github("SCAR/sohungry")
 
 ## Usage
 
-Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, or `so_diet()`.
+Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, `so_dna_diet()`, or `so_diet()`.
 
 ```{r message=FALSE, warning=FALSE}
 library(sohungry)
