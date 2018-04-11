@@ -54,6 +54,28 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
 ##    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
 }
 
+#' SCAR Southern Ocean Diet and Energetics DNA diet data
+#'
+#' @references \url{http://data.aad.gov.au/trophic/}
+#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)
+#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary
+#' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
+#' @param public_only logical: only applicable to \code{method} "direct"
+#' @param verbose logical: show progress messages?
+#'
+#' @return data.frame
+#'
+#' @examples
+#' \dontrun{
+#'   library(dplyr)
+#'   x <- so_dna_diet(cache_dir="c:/temp/diet_cache")
+#'   x %>% filter(predator_name=="Thalassarche melanophris")
+#' }
+#' @export
+so_dna_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
+    get_so_data("dna_diet", method, cache_directory, refresh_cache, public_only, verbose)
+}
+
 #' SCAR Southern Ocean Diet and Energetics isotope data
 #'
 #' @references \url{http://data.aad.gov.au/trophic/}
@@ -214,14 +236,18 @@ soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {
         chand <- new_handle()
         handle_setopt(chand, ssl_verifypeer=0) ## temporarily, to avoid issues with AAD certs
         handle_setheaders(chand, "Cache-Control"="no-cache") ## no server-side caching please
-        curl_download(download_url,destfile=zip_file_name,quiet=!verbose,mode="wb",handle=chand)
+        tryCatch(curl_download(download_url,destfile=zip_file_name,quiet=!verbose,mode="wb",handle=chand),
+                 error=function(e) {
+                     ## clean up if download fails
+                     try(file.remove(zip_file_name), silent=TRUE)
+                     stop(e)
+                 })
         do_unzip <- TRUE
     } else {
         ## using the existing zip
         if (verbose) message("using existing data file: ", zip_file_name)
         ## need to unzip if all files not present
-        do_unzip <- vapply(c(so_opt("sources_file"), so_opt("energetics_file"), so_opt("isotopes_file"), so_opt("diet_file")),## these not there yet, so_opt("dna_diet_file"), so_opt("lipids_file")),
-                           function(z) file.exists(file.path(cache_directory, z)), FUN.VALUE=TRUE)
+        do_unzip <- vapply(c(so_opt("sources_file"), so_opt("energetics_file"), so_opt("isotopes_file"), so_opt("diet_file"), so_opt("dna_diet_file"), so_opt("lipids_file")), function(z) file.exists(file.path(cache_directory, z)), FUN.VALUE=TRUE)
         do_unzip <- !all(do_unzip)
     }
     if (do_unzip) {
