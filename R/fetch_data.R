@@ -1,4 +1,4 @@
-#' SCAR Southern Ocean Diet and Energetics diet data
+#' SCAR Southern Ocean Diet and Energetics data
 #'
 #' @references \url{http://data.aad.gov.au/trophic/}
 #' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)
@@ -10,10 +10,23 @@
 #' @return data.frame
 #'
 #' @examples
-#' \dontrun{
-#'   library(dplyr)
-#'   x <- so_diet(cache_dir="c:/temp/diet_cache")
-#'   x %>% filter(predator_name=="Electrona antarctica")
+#' \dontrun{#'
+#'   ## conventional diet data
+#'   x <- so_diet(cache_directory="c:/temp/diet_cache")
+#'   subset(x, predator_name=="Electrona antarctica")
+#'
+#'   ## DNA diet data
+#'   x <- so_dna_diet(cache_directory="c:/temp/diet_cache")
+#'   subset(x, predator_name=="Thalassarche melanophris")
+#'
+#'   ## stable isotopes
+#'   x <- so_isotopes(cache_directory="c:/temp/diet_cache")
+#'
+#'   ## energetics data
+#'   x <- so_energetics(cache_directory="c:/temp/diet_cache")
+#'
+#'   ## lipids data
+#'   x <- so_lipids(cache_directory="c:/temp/diet_cache")
 #' }
 #' @export
 so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
@@ -54,43 +67,13 @@ so_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only
 ##    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
 }
 
-#' SCAR Southern Ocean Diet and Energetics DNA diet data
-#'
-#' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)
-#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary
-#' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
-#' @param public_only logical: only applicable to \code{method} "direct"
-#' @param verbose logical: show progress messages?
-#'
-#' @return data.frame
-#'
-#' @examples
-#' \dontrun{
-#'   library(dplyr)
-#'   x <- so_dna_diet(cache_dir="c:/temp/diet_cache")
-#'   x %>% filter(predator_name=="Thalassarche melanophris")
-#' }
+#' @rdname so_diet
 #' @export
 so_dna_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
     get_so_data("dna_diet", method, cache_directory, refresh_cache, public_only, verbose)
 }
 
-#' SCAR Southern Ocean Diet and Energetics isotope data
-#'
-#' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably WoRMS taxonomic info)
-#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary
-#' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
-#' @param public_only logical: only applicable to \code{method} "direct"
-#' @param verbose logical: show progress messages?
-#'
-#' @return data.frame
-#'
-#' @examples
-#' \dontrun{
-#'   x <- so_isotopes(cache_dir="c:/temp/diet_cache")
-#' }
+#' @rdname so_diet
 #' @export
 so_isotopes <- function(method="get", cache_directory, refresh_cache=FALSE, public_only=TRUE, verbose=FALSE) {
     get_so_data("isotopes", method, cache_directory, refresh_cache, public_only, verbose)
@@ -120,42 +103,14 @@ so_isotopes <- function(method="get", cache_directory, refresh_cache=FALSE, publ
 ##    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
 }
 
-#' SCAR Southern Ocean Diet and Energetics energetics data
-#'
-#' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably WoRMS taxonomic info)
-#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary
-#' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
-#' @param public_only logical: only applicable to \code{method} "direct"
-#' @param verbose logical: show progress messages?
-#'
-#' @return data.frame
-#'
-#' @examples
-#' \dontrun{
-#'   x <- so_energetics(cache_dir="c:/temp/diet_cache")
-#' }
+#' @rdname so_diet
 #' @export
 so_energetics <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
     get_so_data("energetics", method, cache_directory, refresh_cache, public_only, verbose)
 }
 
 
-#' SCAR Southern Ocean Diet and Energetics lipids and fatty acids data
-#'
-#' @references \url{http://data.aad.gov.au/trophic/}
-#' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only. Note that direct does not include some columns, notably WoRMS taxonomic info)
-#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary
-#' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
-#' @param public_only logical: only applicable to \code{method} "direct"
-#' @param verbose logical: show progress messages?
-#'
-#' @return data.frame
-#'
-#' @examples
-#' \dontrun{
-#'   x <- so_lipids(cache_dir="c:/temp/diet_cache")
-#' }
+#' @rdname so_diet
 #' @export
 so_lipids <- function(method="get",cache_directory,refresh_cache=FALSE,public_only=TRUE,verbose=FALSE) {
     get_so_data("lipids", method, cache_directory, refresh_cache, public_only, verbose)
@@ -189,7 +144,19 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache, publ
         suppress(xs <- read_csv(file.path(unzipped_data_dir,so_opt("sources_file"))))
     }
     xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
-    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
+    x <- x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
+    if (which_data=="dna_diet") {
+        ## coerce some columns
+        x$sequence_source_id <- as.integer(x$sequence_source_id)
+        ## also populate primer source and sequence source details, doi
+        temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
+            dplyr::rename(primer_source_id="source_id", primer_source_details="source_details", primer_source_doi="source_doi")
+        x <- x %>% left_join(temp, by="primer_source_id")
+        temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
+            dplyr::rename(sequence_source_id="source_id", sequence_source_details="source_details", sequence_source_doi="source_doi")
+        x <- x %>% left_join(temp, by="sequence_source_id")
+    }
+    x
 }
 
 

@@ -2,9 +2,25 @@
 % Please edit documentation in R/fetch_data.R
 \name{so_diet}
 \alias{so_diet}
-\title{SCAR Southern Ocean Diet and Energetics diet data}
+\alias{so_dna_diet}
+\alias{so_isotopes}
+\alias{so_energetics}
+\alias{so_lipids}
+\title{SCAR Southern Ocean Diet and Energetics data}
 \usage{
 so_diet(method = "get", cache_directory, refresh_cache = FALSE,
+  public_only = TRUE, verbose = FALSE)
+
+so_dna_diet(method = "get", cache_directory, refresh_cache = FALSE,
+  public_only = TRUE, verbose = FALSE)
+
+so_isotopes(method = "get", cache_directory, refresh_cache = FALSE,
+  public_only = TRUE, verbose = FALSE)
+
+so_energetics(method = "get", cache_directory, refresh_cache = FALSE,
+  public_only = TRUE, verbose = FALSE)
+
+so_lipids(method = "get", cache_directory, refresh_cache = FALSE,
   public_only = TRUE, verbose = FALSE)
 }
 \arguments{
@@ -22,13 +38,26 @@ so_diet(method = "get", cache_directory, refresh_cache = FALSE,
 data.frame
 }
 \description{
-SCAR Southern Ocean Diet and Energetics diet data
+SCAR Southern Ocean Diet and Energetics data
 }
 \examples{
-\dontrun{
-  library(dplyr)
-  x <- so_diet(cache_dir="c:/temp/diet_cache")
-  x \%>\% filter(predator_name=="Electrona antarctica")
+\dontrun{#'
+  ## conventional diet data
+  x <- so_diet(cache_directory="c:/temp/diet_cache")
+  subset(x, predator_name=="Electrona antarctica")
+
+  ## DNA diet data
+  x <- so_dna_diet(cache_directory="c:/temp/diet_cache")
+  subset(x, predator_name=="Thalassarche melanophris")
+
+  ## stable isotopes
+  x <- so_isotopes(cache_directory="c:/temp/diet_cache")
+
+  ## energetics data
+  x <- so_energetics(cache_directory="c:/temp/diet_cache")
+
+  ## lipids data
+  x <- so_lipids(cache_directory="c:/temp/diet_cache")
 }
 }
 \references{
