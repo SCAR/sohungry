@@ -36,6 +36,8 @@ install_github("SCAR/sohungry")
 
 Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, `so_dna_diet()`, or `so_diet()`.
 
+## Examples
+
 ```{r message=FALSE, warning=FALSE}
 library(sohungry)
 library(dplyr)
@@ -47,12 +49,12 @@ library(ggplot2)
 
 Load the stable isotope data:
 ```{r message=FALSE}
-xi <- so_isotopes()
+xi <- so_isotopes(format="mv")
 ```
 
-Filter to taxon of interest:
-```{r message=FALSE}
-xi %>% filter(taxon_name=="Electrona carlsbergi") %>% dplyr::select(delta_13c_mean,delta_15n_mean)
+Filter to taxon of interest, selecting d13C and d15N records:
+```{r message=FALSE, warning=FALSE}
+xi %>% dplyr::filter(taxon_name=="Electrona carlsbergi" & measurement_name %in% c("delta_13C", "delta_15N"))
 ```
 
 ### Diet
