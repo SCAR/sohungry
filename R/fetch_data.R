@@ -180,7 +180,7 @@ soded_webget <- function(cache_directory,refresh_cache=FALSE,verbose=FALSE) {
             if (refresh_cache || !file.exists(temp)) use_existing_zip <- FALSE
             ## is cached copy old?
             if (file.exists(temp)) {
-                if (difftime(Sys.time(),file.info(temp)$mtime,units="days")>30)
+                if (!refresh_cache && difftime(Sys.time(),file.info(temp)$mtime,units="days")>30)
                     warning("cached copy of data is more than 30 days old, consider refreshing your copy")
             }
         }
