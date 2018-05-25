@@ -6,7 +6,7 @@
 \alias{so_isotopes}
 \alias{so_energetics}
 \alias{so_lipids}
-\title{SCAR Southern Ocean Diet and Energetics data}
+\title{Load data from the SCAR Southern Ocean Diet and Energetics database}
 \usage{
 so_diet(method = "get", cache_directory, refresh_cache = FALSE,
   public_only = TRUE, verbose = FALSE)
@@ -15,7 +15,7 @@ so_dna_diet(method = "get", cache_directory, refresh_cache = FALSE,
   public_only = TRUE, verbose = FALSE)
 
 so_isotopes(method = "get", cache_directory, refresh_cache = FALSE,
-  public_only = TRUE, verbose = FALSE)
+  public_only = TRUE, verbose = FALSE, format = "wide")
 
 so_energetics(method = "get", cache_directory, refresh_cache = FALSE,
   public_only = TRUE, verbose = FALSE)
@@ -33,12 +33,17 @@ so_lipids(method = "get", cache_directory, refresh_cache = FALSE,
 \item{public_only}{logical: only applicable to \code{method} "direct"}
 
 \item{verbose}{logical: show progress messages?}
+
+\item{format}{string: (for \code{so_isotopes} only) if "wide", the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. See Details for future changes to the default value of this parameter}
 }
 \value{
 data.frame
 }
 \description{
-SCAR Southern Ocean Diet and Energetics data
+Load data from the SCAR Southern Ocean Diet and Energetics database. Data will be fetched from the remote server and optionally cached locally, or fetched from the local cache, depending on the arguments passed. Note that \code{so_isotopes} now has a \code{format} parameter - see Details below.
+}
+\details{
+The \code{format} parameter was introduced to the \code{so_isotopes} function in package version 0.4.0. The current default \code{format} is "wide", in which case the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. Note that "mv" will become the default (and possibly only) option in a later release. Currently, \code{record_id} values in measurement-value format are not unique (they follow the \code{record_id} values from the wide format). The \code{record_id} values in measurement-value format are likely to change in a future release.
 }
 \examples{
 \dontrun{#'
@@ -50,8 +55,11 @@ SCAR Southern Ocean Diet and Energetics data
   x <- so_dna_diet(cache_directory="c:/temp/diet_cache")
   subset(x, predator_name=="Thalassarche melanophris")
 
-  ## stable isotopes
+  ## stable isotopes in wide format
   x <- so_isotopes(cache_directory="c:/temp/diet_cache")
+
+  ## stable isotopes in measurement-value (long) format
+  x <- so_isotopes(cache_directory="c:/temp/diet_cache", format="mv")
 
   ## energetics data
   x <- so_energetics(cache_directory="c:/temp/diet_cache")

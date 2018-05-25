@@ -1,4 +1,8 @@
-#' SCAR Southern Ocean Diet and Energetics data
+#' Load data from the SCAR Southern Ocean Diet and Energetics database
+#'
+#' Load data from the SCAR Southern Ocean Diet and Energetics database. Data will be fetched from the remote server and optionally cached locally, or fetched from the local cache, depending on the arguments passed. Note that \code{so_isotopes} now has a \code{format} parameter - see Details below.
+#'
+#' The \code{format} parameter was introduced to the \code{so_isotopes} function in package version 0.4.0. The current default \code{format} is "wide", in which case the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. Note that "mv" will become the default (and possibly only) option in a later release. Currently, \code{record_id} values in measurement-value format are not unique (they follow the \code{record_id} values from the wide format). The \code{record_id} values in measurement-value format are likely to change in a future release.
 #'
 #' @references \url{http://data.aad.gov.au/trophic/}
 #' @param method string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)
@@ -6,6 +10,7 @@
 #' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
 #' @param public_only logical: only applicable to \code{method} "direct"
 #' @param verbose logical: show progress messages?
+#' @param format string: (for \code{so_isotopes} only) if "wide", the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. See Details for future changes to the default value of this parameter
 #'
 #' @return data.frame
 #'
@@ -19,8 +24,11 @@
 #'   x <- so_dna_diet(cache_directory="c:/temp/diet_cache")
 #'   subset(x, predator_name=="Thalassarche melanophris")
 #'
-#'   ## stable isotopes
+#'   ## stable isotopes in wide format
 #'   x <- so_isotopes(cache_directory="c:/temp/diet_cache")
+#'
+#'   ## stable isotopes in measurement-value (long) format
+#'   x <- so_isotopes(cache_directory="c:/temp/diet_cache", format="mv")
 #'
 #'   ## energetics data
 #'   x <- so_energetics(cache_directory="c:/temp/diet_cache")
@@ -75,32 +83,16 @@ so_dna_diet <- function(method="get",cache_directory,refresh_cache=FALSE,public_
 
 #' @rdname so_diet
 #' @export
-so_isotopes <- function(method="get", cache_directory, refresh_cache=FALSE, public_only=TRUE, verbose=FALSE) {
-    get_so_data("isotopes", method, cache_directory, refresh_cache, public_only, verbose)
-##    assert_that(is.string(method))
-##    assert_that(is.flag(refresh_cache))
-##    assert_that(is.flag(public_only))
-##    method <- match.arg(tolower(method), c("get","direct"))
-##    if (method=="direct") {
-##        if (!requireNamespace("aadcdb", quietly=TRUE)) {
-##            stop("The aadcdb package is required for method=\"direct\"",call.=FALSE)
-##        }
-##        on.exit(try(aadcdb::db_close(dbh),silent=TRUE))
-##        where_string <- if (public_only) " where is_public_flag='Y'" else ""
-##        dbh <- aadcdb::db_open()
-##        x <- aadcdb::db_query(dbh,paste0("select * from ",so_opt("isotopes_table"),where_string))
-##        if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
-##        if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki="taxon_group")
-##        xs <- aadcdb::db_query(dbh,paste0("select * from ",so_opt("sources_table")))
-##    } else {
-##        unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
-##        suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
-##        suppress(x <- read_csv(file.path(unzipped_data_dir,so_opt("isotopes_file"))))
-##        ##if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
-##        suppress(xs <- read_csv(file.path(unzipped_data_dir,so_opt("sources_file"))))
-##    }
-##    xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
-##    x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")
+so_isotopes <- function(method="get", cache_directory, refresh_cache=FALSE, public_only=TRUE, verbose=FALSE, format="wide") {
+    assert_that(is.string(format))
+    format <- match.arg(tolower(format), c("wide", "mv"))
+    if (format=="wide") {
+        sodata_type <- "isotopes"
+        warning("format=\"mv\" will become the default (and possibly only) format option for so_isotopes in a later release of the sohungry package. Consider changing your code now to use this format.\nFor more information see help(\"so_isotopes\") or the package NEWS.md file on https://github.com/SCAR/sohungry")
+    } else {
+        sodata_type <- "isotopes_mv"
+    }
+    get_so_data(sodata_type, method, cache_directory, refresh_cache, public_only, verbose)
 }
 
 #' @rdname so_diet
@@ -119,7 +111,7 @@ so_lipids <- function(method="get",cache_directory,refresh_cache=FALSE,public_on
 ## common code
 get_so_data <- function(which_data, method, cache_directory, refresh_cache, public_only, verbose) {
     assert_that(is.string(which_data))
-    which_data <- match.arg(tolower(which_data), c("diet", "dna_diet", "energetics", "isotopes", "lipids"))
+    which_data <- match.arg(tolower(which_data), c("diet", "dna_diet", "energetics", "isotopes", "isotopes_mv", "lipids"))
     assert_that(is.string(method))
     assert_that(is.flag(refresh_cache))
     assert_that(is.flag(public_only))
@@ -140,8 +132,16 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache, publ
     } else {
         unzipped_data_dir <- soded_webget(cache_directory,refresh_cache=refresh_cache,verbose=verbose)
         suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
-        suppress(x <- read_csv(file.path(unzipped_data_dir,so_opt(paste0(which_data, "_file")))))
-        suppress(xs <- read_csv(file.path(unzipped_data_dir,so_opt("sources_file"))))
+        my_data_file <- file.path(unzipped_data_dir,so_opt(paste0(which_data, "_file")))
+        if (!file.exists(my_data_file)) {
+            stop("data file does not exist. Please try again using refresh_cache=TRUE. ", so_opt("issue_text"))
+        }
+        suppress(x <- read_csv(my_data_file))
+        my_data_file <- file.path(unzipped_data_dir,so_opt("sources_file"))
+        if (!file.exists(my_data_file)) {
+            stop("data file does not exist. Try again using refresh_cache=TRUE. ", so_opt("issue_text"))
+        }
+        suppress(xs <- read_csv(my_data_file))
     }
     xs <- dplyr::rename(xs, source_details="details", source_doi="doi")
     x <- x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")),by="source_id")

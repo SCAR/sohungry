@@ -1,4 +1,4 @@
-context("sohungry")
+context("data filtering")
 
 test_that("filtering of diet data works", {
     xx <- data.frame(fraction_diet_by_weight=c(0,NA,0),fraction_diet_by_prey_items=c(1,1,0),fraction_occurrence=c(1,1,0))
