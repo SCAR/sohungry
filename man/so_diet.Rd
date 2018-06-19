@@ -8,25 +8,26 @@
 \alias{so_lipids}
 \title{Load data from the SCAR Southern Ocean Diet and Energetics database}
 \usage{
-so_diet(method = "get", cache_directory, refresh_cache = FALSE,
-  public_only = TRUE, verbose = FALSE)
+so_diet(method = "get", cache_directory = "session",
+  refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
 
-so_dna_diet(method = "get", cache_directory, refresh_cache = FALSE,
-  public_only = TRUE, verbose = FALSE)
+so_dna_diet(method = "get", cache_directory = "session",
+  refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
 
-so_isotopes(method = "get", cache_directory, refresh_cache = FALSE,
-  public_only = TRUE, verbose = FALSE, format = "wide")
+so_isotopes(method = "get", cache_directory = "session",
+  refresh_cache = FALSE, public_only = TRUE, verbose = FALSE,
+  format = "wide")
 
-so_energetics(method = "get", cache_directory, refresh_cache = FALSE,
-  public_only = TRUE, verbose = FALSE)
+so_energetics(method = "get", cache_directory = "session",
+  refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
 
-so_lipids(method = "get", cache_directory, refresh_cache = FALSE,
-  public_only = TRUE, verbose = FALSE)
+so_lipids(method = "get", cache_directory = "session",
+  refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{method}{string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)}
 
-\item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. The cache directory will be created if it does not exist. A warning will be given if a cached copy exists and is more than 30 days old. Note that even if no \code{cache_directory} is specified, a per-session cache will be used to reduce load on the server. Use \code{refresh_cache=TRUE} to re-load the data if necessary}
+\item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. Values can be "session" (a per-session temporary directory will be used, default), "persistent" (the directory returned by \code{rappdirs::user_cache_dir} will be used), or a string giving the path to the directory to use. Use \code{NULL} for no caching. An attempt will be made to create the cache directory if it does not exist. A warning will be given if a cached copy of the data file exists and is more than 30 days old. Use \code{refresh_cache = TRUE} to refresh the cached data if necessary}
 
 \item{refresh_cache}{logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used}
 
@@ -46,26 +47,26 @@ Load data from the SCAR Southern Ocean Diet and Energetics database. Data will b
 The \code{format} parameter was introduced to the \code{so_isotopes} function in package version 0.4.0. The current default \code{format} is "wide", in which case the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. Note that "mv" will become the default (and possibly only) option in a later release. Currently, \code{record_id} values in measurement-value format are not unique (they follow the \code{record_id} values from the wide format). The \code{record_id} values in measurement-value format are likely to change in a future release.
 }
 \examples{
-\dontrun{#'
+\dontrun{
   ## conventional diet data
-  x <- so_diet(cache_directory="c:/temp/diet_cache")
-  subset(x, predator_name=="Electrona antarctica")
+  x <- so_diet()
+  subset(x, predator_name == "Electrona antarctica")
 
   ## DNA diet data
-  x <- so_dna_diet(cache_directory="c:/temp/diet_cache")
-  subset(x, predator_name=="Thalassarche melanophris")
+  x <- so_dna_diet()
+  subset(x, predator_name == "Thalassarche melanophris")
 
   ## stable isotopes in wide format
-  x <- so_isotopes(cache_directory="c:/temp/diet_cache")
+  x <- so_isotopes()
 
   ## stable isotopes in measurement-value (long) format
-  x <- so_isotopes(cache_directory="c:/temp/diet_cache", format="mv")
+  x <- so_isotopes(format = "mv")
 
   ## energetics data
-  x <- so_energetics(cache_directory="c:/temp/diet_cache")
+  x <- so_energetics()
 
   ## lipids data
-  x <- so_lipids(cache_directory="c:/temp/diet_cache")
+  x <- so_lipids()
 }
 }
 \references{
