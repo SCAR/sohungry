@@ -11,54 +11,53 @@
 #'
 #' @return data.frame with columns:
 #' \itemize{
-#'    \item{fraction_diet_by_weight - mean fraction of diet by weight}
 #'    \item{N_fraction_diet_by_weight - number of diet observations where fraction of diet by weight was quantified}
-#'    \item{fraction_occurrence - mean fraction of occurrence}
+#'    \item{fraction_diet_by_weight - mean fraction of diet by weight}
 #'    \item{N_fraction_occurrence - number of diet observations where fraction of occurrence quantified}
-#'    \item{fraction_diet_by_prey_items - mean fraction of diet by number of prey items}
+#'    \item{fraction_occurrence - mean fraction of occurrence}
 #'    \item{N_fraction_diet_by_prey_items - number of diet observations where fraction of diet by number of prey items was quantified}
+#'    \item{fraction_diet_by_prey_items - mean fraction of diet by number of prey items}
 #' }
 #'
 #' @examples
 #' \dontrun{
-#'   library(dplyr)
 #'   x <- so_diet()
 #'
 #'   ## summary of what Electrona carlsbergi eats
 #'   x %>% filter_by_predator_name("Electrona carlsbergi") %>%
-#'   diet_summary(summary_type="prey")
+#'   diet_summary(summary_type = "prey")
 #'
 #'   ## summary of what eats Electrona carlsbergi
 #'   x %>% filter_by_prey_name("Electrona carlsbergi") %>%
-#'   diet_summary(summary_type="predators")
+#'   diet_summary(summary_type = "predators")
 #' }
 #'
 #' @export
-diet_summary <- function(x,summary_type="prey",minimum_importance=0,treat_trace_values_as=0) {
+diet_summary <- function(x, summary_type = "prey", minimum_importance = 0, treat_trace_values_as = 0) {
     assert_that(is.string(summary_type))
-    summary_type <- match.arg(tolower(summary_type),c("prey","predators"))
+    summary_type <- match.arg(tolower(summary_type), c("prey", "predators"))
     ## rename appropriate col to "group"
-    if (summary_type=="prey") {
-        out <- x %>% mutate_(group=~prey_group_soki)
+    if (summary_type == "prey") {
+        out <- x %>% mutate_(group = ~prey_group_soki)
     } else {
-        out <- x %>% mutate_(group=~predator_group_soki)
+        out <- x %>% mutate_(group = ~predator_group_soki)
     }
     ## deal with trace values before aggregation
     out <- out %>% replace_trace_values(treat_trace_values_as)
     ## aggregate by group
     out <- out %>% group_by_(~group) %>%
-        summarize_(fraction_diet_by_weight=~as.numeric(mean(fraction_diet_by_weight,na.rm=TRUE)),
-                   N_fraction_diet_by_weight=~sum(!is.na(fraction_diet_by_weight)),
-                   fraction_occurrence=~as.numeric(mean(fraction_occurrence,na.rm=TRUE)),
-                   N_fraction_occurrence=~sum(!is.na(fraction_occurrence)),
-                   fraction_diet_by_prey_items=~as.numeric(mean(fraction_diet_by_prey_items,na.rm=TRUE)),
-                   N_fraction_diet_by_prey_items=~sum(!is.na(fraction_diet_by_prey_items))) %>%
-        mutate_(all_zero_count=~N_fraction_diet_by_weight==0 & N_fraction_occurrence==0 & N_fraction_diet_by_prey_items==0) %>%
-        mutate_(group=~replace(group,is.na(group),"Uncategorized group")) %>%
-        filter_by_importance(threshold=minimum_importance) %>% ##apply minimum importance threshold now, after aggregation
+        summarize_(N_fraction_diet_by_weight = ~sum(!is.na(fraction_diet_by_weight)),
+                   fraction_diet_by_weight = ~as.numeric(mean(fraction_diet_by_weight, na.rm = TRUE)),
+                   N_fraction_occurrence = ~sum(!is.na(fraction_occurrence)),
+                   fraction_occurrence = ~as.numeric(mean(fraction_occurrence, na.rm = TRUE)),
+                   N_fraction_diet_by_prey_items = ~sum(!is.na(fraction_diet_by_prey_items)),
+                   fraction_diet_by_prey_items = ~as.numeric(mean(fraction_diet_by_prey_items, na.rm = TRUE))) %>%
+        mutate_(all_zero_count = ~N_fraction_diet_by_weight == 0 & N_fraction_occurrence == 0 & N_fraction_diet_by_prey_items == 0) %>%
+        mutate_(group = ~replace(group, is.na(group), "Uncategorized group")) %>%
+        filter_by_importance(threshold = minimum_importance) %>% ##apply minimum importance threshold now, after aggregation
         filter_(~(fraction_diet_by_weight>0 | fraction_occurrence>0 | fraction_diet_by_prey_items>0) | (all_zero_count))
     ##last OR condition is special case: if all dietary importance measures are null for this group, we still want to show it
-    if (summary_type=="prey") {
+    if (summary_type == "prey") {
         out %>% select_(quote(-all_zero_count)) %>% dplyr::rename(prey="group")
     } else {
         out %>% select_(quote(-all_zero_count)) %>% dplyr::rename(predator="group")

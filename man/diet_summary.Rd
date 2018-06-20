@@ -19,12 +19,12 @@ diet_summary(x, summary_type = "prey", minimum_importance = 0,
 \value{
 data.frame with columns:
 \itemize{
-   \item{fraction_diet_by_weight - mean fraction of diet by weight}
    \item{N_fraction_diet_by_weight - number of diet observations where fraction of diet by weight was quantified}
-   \item{fraction_occurrence - mean fraction of occurrence}
+   \item{fraction_diet_by_weight - mean fraction of diet by weight}
    \item{N_fraction_occurrence - number of diet observations where fraction of occurrence quantified}
-   \item{fraction_diet_by_prey_items - mean fraction of diet by number of prey items}
+   \item{fraction_occurrence - mean fraction of occurrence}
    \item{N_fraction_diet_by_prey_items - number of diet observations where fraction of diet by number of prey items was quantified}
+   \item{fraction_diet_by_prey_items - mean fraction of diet by number of prey items}
 }
 }
 \description{
@@ -34,16 +34,15 @@ study of 100 individuals will carry the same weight as a study of one individual
 }
 \examples{
 \dontrun{
-  library(dplyr)
   x <- so_diet()
 
   ## summary of what Electrona carlsbergi eats
   x \%>\% filter_by_predator_name("Electrona carlsbergi") \%>\%
-  diet_summary(summary_type="prey")
+  diet_summary(summary_type = "prey")
 
   ## summary of what eats Electrona carlsbergi
   x \%>\% filter_by_prey_name("Electrona carlsbergi") \%>\%
-  diet_summary(summary_type="predators")
+  diet_summary(summary_type = "predators")
 }
 
 }
