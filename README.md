@@ -26,4 +26,4 @@ Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, 
 Examples
 --------
 
-See the package vignette.
+See the [package vignette](https://scar.github.io/sohungry/articles/sohungry.html).
