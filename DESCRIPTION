@@ -19,7 +19,11 @@ Imports:
   readr
 Suggests:
   aadcdb,
-  testthat,
-  knitr
+  covr,
+  ggplot2,
+  knitr,
+  rmarkdown,
+  tidyr,
+  testthat
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

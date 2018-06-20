@@ -1,0 +1,148 @@
+---
+title: "Southen Ocean Diet and Energetics Data"
+author: "Ben Raymond"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sohungry}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r chunkopts, eval = TRUE, echo = FALSE}
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE, tidy = FALSE, cache = FALSE, include = TRUE, dpi = 72, fig.width = 9, fig.height = 6, fig.align = "center", results = "markup")
+library(knitr)
+options(knitr.kable.NA = "")
+
+## tidy up column names a bit
+prettier <- function(z, first_to_capital = TRUE) {
+  z <- gsub("_", " ", z)
+  if (first_to_capital) z <- paste0(toupper(substr(z, 1, 1)), substr(z, 2, nchar(z)))
+  z
+}
+```
+
+## Overview
+
+This R package provides access to the SCAR Southern Ocean Diet and Energetics Database, and some tools for working with these data. For more information about the database see http://data.aad.gov.au/trophic/.
+
+
+### Installing
+
+```{r eval = FALSE}
+install.packages("devtools")
+library(devtools)
+install_github("SCAR/sohungry")
+```
+
+## Usage
+
+Basic usage: load the desired dataset using `so_isotopes()`, `so_energetics()`, `so_lipids()`, `so_dna_diet()`, or `so_diet()`.
+
+## Examples
+
+```{r}
+library(sohungry)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+### Isotopes
+
+Load the stable isotope data, in measurement-value format (one row per measurement):
+```{r}
+xi <- so_isotopes(format = "mv")
+```
+
+Filter to taxon of interest, selecting d13C and d15N records:
+```{r}
+xi %>% dplyr::filter(taxon_name == "Electrona carlsbergi" & measurement_name %in% c("delta_13C", "delta_15N"))
+```
+
+### Diet
+
+Load the diet data (stomach content analyses and similar):
+```{r}
+x <- so_diet()
+```
+
+A summary of what *Electrona carlsbergi* eats:
+```{r eval = FALSE}
+x %>% filter_by_predator_name("Electrona carlsbergi") %>% diet_summary(summary_type = "prey")
+```
+```{r echo = FALSE}
+temp <- x %>% filter_by_predator_name("Electrona carlsbergi") %>% diet_summary(summary_type = "prey")
+kable(temp, col.names = prettier(names(temp)), digits = 2)
+```
+
+And what eats *Electrona carlsbergi*:
+```{r eval = FALSE}
+x %>% filter_by_prey_name("Electrona carlsbergi") %>% diet_summary(summary_type = "predators")
+```
+```{r echo = FALSE}
+temp <- x %>% filter_by_prey_name("Electrona carlsbergi") %>% diet_summary(summary_type = "predators")
+kable(temp, col.names = prettier(names(temp)), digits = 2)
+```
+
+### Energetics
+
+```{r}
+xe <- so_energetics()
+```
+
+Select all single-individual records of *Electrona antarctica*:
+
+```{r}
+edx <- xe %>% dplyr::filter(taxon_sample_count == 1 & taxon_name == "Electrona antarctica")
+
+## discard the dry-weight energy density values
+edx <- edx %>% dplyr::filter(measurement_units != "kJ/gDW")
+
+## some data manipulation
+edx <- edx %>%
+  ## remove the spaces from the measurement names, for convenience
+  mutate(measurement_name = gsub("[[:space:]]+", "_", measurement_name)) %>%
+  ## convert to wide format
+  dplyr::select(source_id, taxon_sample_id, measurement_name, measurement_mean_value) %>%
+  tidyr::spread(measurement_name, measurement_mean_value)
+
+## what does this look like?
+edx
+```
+
+Plot the wet weight against wet-weight energy density:
+
+```{r ea_plot1}
+p <- ggplot(edx, aes(wet_weight, energy_content))+geom_point()+theme_bw()+
+  labs(x = "Wet weight (g)", y = "Energy density (kJ/g wet weight)")
+plot(p)
+```
+
+Fit an allometric equation:
+
+```{r ea_plot2}
+fit <- lm(log(energy_content)~log(wet_weight), data = edx)
+px <- tibble(wet_weight = seq(from = min(edx$wet_weight), to = max(edx$wet_weight), length.out = 51))
+px$energy_content <- exp(predict(fit, newdata = px))
+p+geom_path(data = px, colour = "dodgerblue")
+```
+
+
+### Lipids and fatty acids
+
+```{r}
+xl <- so_lipids()
+```
+
+Select lipid-class data from Connan et al. (2007), and plot similar to Figure 2 from that paper:
+
+```{r lip_plot1}
+xl <- xl %>% dplyr::filter(source_id == 126 & measurement_class == "lipid class") %>%
+  mutate(measurement_name = sub(" content", "", measurement_name)) ## tidy the names a little
+
+ggplot(xl,
+  aes(measurement_name, measurement_mean_value, fill = taxon_life_stage, group = taxon_life_stage))+
+  geom_col(position = "dodge")+theme_bw()+
+  labs(x = "Lipid class", y = "Percentage of lipids")
+```
