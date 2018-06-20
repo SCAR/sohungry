@@ -12,11 +12,8 @@ matrix:
           env:
            - BUILD_NAME=trusty_release
            - DETAILS="trusty release build"
-
-# set NOT_CRAN to true to ensure that skip_on_cran tests are run here
-env:
-  - NOT_CRAN=true
-  - _R_CHECK_FORCE_SUGGESTS_=false # to avoid failure because of aadcdb suggest
+           - NOT_CRAN=true # run skip_on_cran tests
+           - _R_CHECK_FORCE_SUGGESTS_=false # to avoid failure because of aadcdb suggest
 
 after_success:
   - Rscript -e 'covr::codecov()'
