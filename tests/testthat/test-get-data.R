@@ -13,7 +13,7 @@ test_that("data retrieval works", {
 test_that("session caching works", {
     skip_on_cran()
     cdir <- so_opt("session_cache_dir")
-    cfile <- file.path(cdir, "soded_data.zip")
+    cfile <- file.path(cdir, so_opt("zip_file"))
     if (file.exists(cfile)) file.remove(cfile)
     expect_message(xl <- so_lipids(cache_directory = "session", verbose = TRUE), "downloading data file")
     expect_true(file.exists(cfile))
@@ -33,7 +33,7 @@ test_that("session caching works", {
 test_that("persistent caching works", {
     skip_on_cran()
     cdir <- so_opt("persistent_cache_dir")
-    cfile <- file.path(cdir, "soded_data.zip")
+    cfile <- file.path(cdir, so_opt("zip_file"))
     if (file.exists(cfile)) file.remove(cfile)
     xd <- so_diet(cache_directory = "persistent")
     expect_true(file.exists(cfile))
@@ -53,7 +53,7 @@ test_that("persistent caching works", {
 test_that("persistent caching to custom directory works", {
     skip_on_cran()
     cdir <- tempdir()
-    cfile <- file.path(cdir, "soded_data.zip")
+    cfile <- file.path(cdir, so_opt("zip_file"))
     if (file.exists(cfile)) file.remove(cfile)
     xd <- so_diet(cache_directory = cdir)
     expect_true(file.exists(cfile))

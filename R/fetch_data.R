@@ -80,14 +80,16 @@ so_lipids <- function(method = "get",cache_directory = "session",refresh_cache =
 }
 
 ## common code
-get_so_data <- function(which_data, method, cache_directory, refresh_cache, public_only, verbose) {
+get_so_data <- function(which_data, method, cache_directory, refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
     assert_that(is.string(which_data))
-    which_data <- match.arg(tolower(which_data), c("diet", "dna_diet", "energetics", "isotopes", "isotopes_mv", "lipids"))
+    which_data <- match.arg(tolower(which_data), c("doi", "diet", "dna_diet", "energetics", "isotopes", "isotopes_mv", "lipids"))
+    ## NB calling get_so_data("doi") is intended for internal use only
     assert_that(is.string(method))
     assert_that(is.flag(refresh_cache))
     assert_that(is.flag(public_only))
     method <- match.arg(tolower(method), c("get", "direct"))
     if (method == "direct") {
+        if (which_data == "doi") return(so_default_doi())
         if (!requireNamespace("aadcdb", quietly = TRUE)) {
             stop("The aadcdb package is required for method = \"direct\"", call. = FALSE)
         }
@@ -100,7 +102,19 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache, publ
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki = "taxon_group")
         xs <- aadcdb::db_query(dbh, paste0("select * from ", so_opt("sources_table")))
+        so_set_opt(DOI = so_default_doi()) ## default DOI, since we are reading direct from DB
     } else {
+        if (which_data == "doi") {
+            unzipped_data_dir <- soded_webget(cache_directory, refresh_cache = refresh_cache, verbose = verbose, cache_directory_only = TRUE)
+            my_data_file <- file.path(unzipped_data_dir, so_opt(paste0(which_data, "_file")))
+            ## here, if we don't have a valid DOI, return NA
+            my_doi <- if (!file.exists(my_data_file)) {
+                          NA_character_
+                      } else {
+                          tryCatch(gsub("[[:space:]]+", "", readLines(my_data_file)[1]), error = function(e) NA_character_)
+                      }
+            return(my_doi)
+        }
         unzipped_data_dir <- soded_webget(cache_directory, refresh_cache = refresh_cache, verbose = verbose)
         suppress <- if (!verbose) function(...)suppressWarnings(suppressMessages(...)) else function(...) identity(...)
         my_data_file <- file.path(unzipped_data_dir, so_opt(paste0(which_data, "_file")))
@@ -113,6 +127,16 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache, publ
             stop("data file does not exist. Try again using refresh_cache = TRUE. ", so_opt("issue_text"))
         }
         suppress(xs <- read_csv(my_data_file))
+        ## DOI of the data we have just read
+        my_doi <- tryCatch({
+            my_doi_file <- file.path(unzipped_data_dir, so_opt("doi_file"))
+            if (!file.exists(my_doi_file)) {
+                so_default_doi()
+            } else {
+                gsub("[[:space:]]+", "", readLines(my_doi_file)[1])
+            }
+            }, error = function(e) so_default_doi())
+        so_set_opt(DOI = my_doi)
     }
     xs <- dplyr::rename(xs, source_details = "details", source_doi = "doi")
     x <- x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")), by = "source_id")
@@ -132,9 +156,9 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache, publ
 
 
 ## internal function to retrieve the zipped data file and unpack it
-soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE) {
+soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE, cache_directory_only = FALSE) {
     ## fetch via GET, with local caching support
-    zip_file_name <- "soded_data.zip" ## local name for the zip file
+    zip_file_name <- so_opt("zip_file") ## local basename for the zip file
     use_existing_zip <- FALSE
     if (missing(cache_directory)) cache_directory <- "session"
     if (is.null(cache_directory)) {
@@ -149,6 +173,7 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
         cache_directory <- so_opt("persistent_cache_dir")
         create_recursively <- TRUE ## necessary here
     }
+    if (cache_directory_only) return(cache_directory)
     if (!dir.exists(cache_directory)) {
         if (verbose) message("creating data cache directory: ", cache_directory, "\n")
         ok <- dir.create(cache_directory, recursive = create_recursively)
@@ -168,7 +193,7 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
     }
     zip_file_name <- file.path(cache_directory, zip_file_name)
 
-    download_url <- "http://data.aad.gov.au/database/trophic/scar_dump_v2.zip" ## temporary location, will be moved to registered AADC download file or geoserver endpoint
+    download_url <- "https://data.aad.gov.au/eds/4722/download"
     ## http://data.aad.gov.au/geoserver/aadc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=aadc:TROPHIC_DIET&maxFeatures=100000&outputFormat=csv
     ## fetch data if needed
     if (!use_existing_zip) {

@@ -1,6 +1,7 @@
 .onLoad <- function(libname, pkgname) {
     ## populate the options slot
     this_options <- list(
+        doi_file = "scar_diet_energetics_doi.txt",
         sources_table = "ecology.dbo.scar_references",
         sources_file = "scar_sources.csv",
         energetics_table = "ecology.dbo.scar_energetics",
@@ -14,6 +15,7 @@
         dna_diet_file = "scar_dna_diet.csv",
         lipids_table = "ecology.dbo.scar_lipids",
         lipids_file = "scar_lipids.csv",
+        zip_file = "SCAR_Diet_Energetics.zip",
         issue_text = "If the problem persists, please lodge an issue at https://github.com/SCAR/sohungry/issues",
         session_cache_dir = file.path(tempdir(), "sohungry-cache"), ## cache directory to use for cache_directory = "session"
         persistent_cache_dir = rappdirs::user_cache_dir("sohungry", "SCAR") ## and for cache_directory = "persistent"
