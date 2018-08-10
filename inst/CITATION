@@ -1,0 +1,24 @@
+citHeader(paste("The SCAR Diet and Energetics database is released under a CC-BY license: please cite these data when using. If you have used data from a small number of individual sources (check the source_id and source_details values of the data you used), please cite the original data sources and additionally acknowledge this database. For example:",
+"",
+paste0("Smith J (2008) On the use of stable isotopes. Journal of Stable Isotope Stuff 123:100–110. Data obtained from the SCAR Southern Ocean Diet and Energetics Database, doi:", sohungry::so_doi()),
+"",
+"If you have used data from many individual sources, the overall citation for this database is:",
+"",
+paste0("Scientific Committee on Antarctic Research (2018) Southern Ocean Diet and Energetics Database. doi:", sohungry::so_doi()),
+"",
+"However, you are encouraged to cite all primary sources (possibly in supplementary material, if there are many).", sep = "\n"))
+
+citEntry(entry = "Manual",
+  title        = "Southern Ocean Diet and Energetics Database",
+  author       = personList(person("Scientific Committee on Antarctic Research")),
+  year         = format(Sys.Date(), "%Y"),
+  url          = paste0("https://doi.org/", sohungry::so_doi()),
+
+  textVersion  =
+  paste("Scientific Committee on Antarctic Research", format(Sys.Date(), "(%Y)"),
+        paste0("Southern Ocean Diet and Energetics Database. doi:", sohungry::so_doi()))
+)
+
+
+
+
