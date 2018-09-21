@@ -217,7 +217,7 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
     }
     if (do_unzip) {
         if (verbose) message("unzipping ", zip_file_name)
-        unzip(zip_file_name,exdir = cache_directory)
+        unzip(zip_file_name,exdir = cache_directory, junkpaths = TRUE)
     }
     cache_directory
 }
