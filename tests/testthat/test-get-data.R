@@ -70,3 +70,25 @@ test_that("persistent caching to custom directory works", {
     expect_gt(as.numeric(file.info(cfile)$mtime), as.numeric(finfo$mtime))
 })
 
+test_that("column format detection isn't throwing warnings", {
+
+    trap_warns <- function(...) {
+        withCallingHandlers(eval(...),
+                            warning = function(w){
+                                if(grepl("will become the default", w$message)){
+                                    NULL ## ignore this
+                                } else {
+                                    stop(w$message)
+                                }
+                            })
+    }
+
+    ## setting verbose = TRUE will cause read_csv to give messages, plus parsing failures will throw warnings
+    ## use trap_warns to promote warnings to errors, but ignoring the "will become the default" warning
+    expect_silent(suppressMessages(suppressWarnings(temp <- trap_warns(so_isotopes(cache_directory = "session", verbose = TRUE)))))
+    expect_silent(suppressMessages(suppressWarnings(temp <- trap_warns(so_isotopes(cache_directory = "session", verbose = TRUE, format = "mv")))))
+    expect_silent(suppressMessages(suppressWarnings(temp <- trap_warns(so_lipids(cache_directory = "session", verbose = TRUE)))))
+    expect_silent(suppressMessages(suppressWarnings(temp <- trap_warns(so_energetics(cache_directory = "session", verbose = TRUE)))))
+    expect_silent(suppressMessages(suppressWarnings(temp <- trap_warns(so_diet(cache_directory = "session", verbose = TRUE)))))
+    expect_silent(suppressMessages(suppressWarnings(temp <- trap_warns(so_dna_diet(cache_directory = "session", verbose = TRUE)))))
+})

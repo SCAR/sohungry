@@ -121,10 +121,59 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         if (!file.exists(my_data_file)) {
             stop("data file does not exist. Please try again using refresh_cache = TRUE. ", so_opt("issue_text"))
         }
-        suppress(x <- read_csv(my_data_file))
+        ## enforce some column formats, some of these fail the read_csv auto-detect
+        cols_fmt <- list(depth_min = "d", depth_max = "d", record_id = "d")
+        if (which_data %in% c("diet", "dna_diet")) {
+            cols_fmt$predator_sample_count <- "d"
+            cols_fmt$predator_sample_id <- "c"
+            cols_fmt$predator_size_mean <- "d"
+            cols_fmt$predator_size_min <- "d"
+            cols_fmt$predator_size_max <- "d"
+            cols_fmt$predator_size_sd <- "d"
+            cols_fmt$predator_mass_mean <- "d"
+            cols_fmt$predator_mass_min <- "d"
+            cols_fmt$predator_mass_max <- "d"
+            cols_fmt$predator_mass_sd <- "d"
+        }
+        if (which_data %in% c("diet")) {
+            cols_fmt$prey_size_mean <- "d"
+            cols_fmt$prey_size_min <- "d"
+            cols_fmt$prey_size_max <- "d"
+            cols_fmt$prey_size_sd <- "d"
+            cols_fmt$prey_mass_mean <- "d"
+            cols_fmt$prey_mass_min <- "d"
+            cols_fmt$prey_mass_max <- "d"
+            cols_fmt$prey_mass_sd <- "d"
+            cols_fmt$consumption_rate_mean <- "d"
+            cols_fmt$consumption_rate_min <- "d"
+            cols_fmt$consumption_rate_max <- "d"
+            cols_fmt$consumption_rate_sd <- "d"
+        }
+        if (which_data %in% c("energetics", "isotopes", "isotopes_mv", "lipids")) {
+            cols_fmt$taxon_sample_count <- "d"
+            cols_fmt$taxon_sample_id <- "c"
+        }
+        if (which_data %in% c("isotopes")) {
+            cols_fmt$taxon_size_mean <- "d"
+            cols_fmt$taxon_size_min <- "d"
+            cols_fmt$taxon_size_max <- "d"
+            cols_fmt$taxon_size_sd <- "d"
+            cols_fmt$taxon_mass_mean <- "d"
+            cols_fmt$taxon_mass_min <- "d"
+            cols_fmt$taxon_mass_max <- "d"
+            cols_fmt$taxon_mass_sd <- "d"
+        }
+        if (which_data %in% c("energetics", "isotopes_mv", "lipids")) {
+            cols_fmt$measurement_mean_value <- "d"
+            cols_fmt$measurement_min_value <- "d"
+            cols_fmt$measurement_max_value <- "d"
+            cols_fmt$measurement_variability_value <- "d"
+        }
+        cols_fmt <- do.call(cols, cols_fmt)
+        suppress(x <- read_csv(my_data_file, col_types = cols_fmt))
         my_data_file <- file.path(unzipped_data_dir, so_opt("sources_file"))
         if (!file.exists(my_data_file)) {
-            stop("data file does not exist. Try again using refresh_cache = TRUE. ", so_opt("issue_text"))
+            stop("sources file does not exist. Try again using refresh_cache = TRUE. ", so_opt("issue_text"))
         }
         suppress(xs <- read_csv(my_data_file))
         ## DOI of the data we have just read
