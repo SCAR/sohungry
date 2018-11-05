@@ -37,7 +37,7 @@
 #'   x <- so_lipids()
 #' }
 #' @export
-so_diet <- function(method = "get",cache_directory = "session",refresh_cache = FALSE,public_only = TRUE,verbose = FALSE) {
+so_diet <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
     x <- get_so_data("diet", method, cache_directory, refresh_cache, public_only, verbose)
     ## ensure dietary importance measures are numeric
     x$fraction_diet_by_weight <- as.numeric(x$fraction_diet_by_weight)
@@ -48,7 +48,7 @@ so_diet <- function(method = "get",cache_directory = "session",refresh_cache = F
 
 #' @rdname so_diet
 #' @export
-so_dna_diet <- function(method = "get",cache_directory = "session",refresh_cache = FALSE,public_only = TRUE,verbose = FALSE) {
+so_dna_diet <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
     get_so_data("dna_diet", method, cache_directory, refresh_cache, public_only, verbose)
 }
 
@@ -68,21 +68,27 @@ so_isotopes <- function(method = "get", cache_directory = "session", refresh_cac
 
 #' @rdname so_diet
 #' @export
-so_energetics <- function(method = "get",cache_directory = "session",refresh_cache = FALSE,public_only = TRUE,verbose = FALSE) {
+so_energetics <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
     get_so_data("energetics", method, cache_directory, refresh_cache, public_only, verbose)
 }
 
 
 #' @rdname so_diet
 #' @export
-so_lipids <- function(method = "get",cache_directory = "session",refresh_cache = FALSE,public_only = TRUE,verbose = FALSE) {
+so_lipids <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
     get_so_data("lipids", method, cache_directory, refresh_cache, public_only, verbose)
+}
+
+#' @rdname so_diet
+#' @export
+so_sources <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
+    get_so_data("sources", method, cache_directory, refresh_cache, public_only, verbose)
 }
 
 ## common code
 get_so_data <- function(which_data, method, cache_directory, refresh_cache = FALSE, public_only = TRUE, verbose = FALSE) {
     assert_that(is.string(which_data))
-    which_data <- match.arg(tolower(which_data), c("doi", "diet", "dna_diet", "energetics", "isotopes", "isotopes_mv", "lipids"))
+    which_data <- match.arg(tolower(which_data), c("doi", "diet", "dna_diet", "energetics", "isotopes", "isotopes_mv", "lipids", "sources"))
     ## NB calling get_so_data("doi") is intended for internal use only
     assert_that(is.string(method))
     assert_that(is.flag(refresh_cache))
@@ -94,7 +100,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             stop("The aadcdb package is required for method = \"direct\"", call. = FALSE)
         }
         on.exit(try(aadcdb::db_close(dbh), silent = TRUE))
-        where_string <- if (public_only) " where is_public_flag = 'Y'" else ""
+        where_string <- if (public_only && !which_data %in% c("sources")) " where is_public_flag = 'Y'" else ""
         dbh <- aadcdb::db_open()
         x <- aadcdb::db_query(dbh, paste0("select * from ", so_opt(paste0(which_data, "_table")), where_string))
         ## backwards compat
@@ -187,18 +193,20 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             }, error = function(e) so_default_doi())
         so_set_opt(DOI = my_doi)
     }
-    xs <- dplyr::rename(xs, source_details = "details", source_doi = "doi")
-    x <- x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")), by = "source_id")
-    if (which_data == "dna_diet") {
-        ## coerce some columns
-        x$sequence_source_id <- as.integer(x$sequence_source_id)
-        ## also populate primer source and sequence source details, doi
-        temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
-            dplyr::rename(primer_source_id = "source_id", primer_source_details = "source_details", primer_source_doi = "source_doi")
-        x <- x %>% left_join(temp, by = "primer_source_id")
-        temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
-            dplyr::rename(sequence_source_id = "source_id", sequence_source_details = "source_details", sequence_source_doi = "source_doi")
-        x <- x %>% left_join(temp, by = "sequence_source_id")
+    if (!which_data %in% c("sources")) {
+        xs <- dplyr::rename(xs, source_details = "details", source_doi = "doi")
+        x <- x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")), by = "source_id")
+        if (which_data == "dna_diet") {
+            ## coerce some columns
+            x$sequence_source_id <- as.integer(x$sequence_source_id)
+            ## also populate primer source and sequence source details, doi
+            temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
+                dplyr::rename(primer_source_id = "source_id", primer_source_details = "source_details", primer_source_doi = "source_doi")
+            x <- x %>% left_join(temp, by = "primer_source_id")
+            temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
+                dplyr::rename(sequence_source_id = "source_id", sequence_source_details = "source_details", sequence_source_doi = "source_doi")
+            x <- x %>% left_join(temp, by = "sequence_source_id")
+        }
     }
     x
 }

@@ -6,6 +6,7 @@
 \alias{so_isotopes}
 \alias{so_energetics}
 \alias{so_lipids}
+\alias{so_sources}
 \title{Load data from the SCAR Southern Ocean Diet and Energetics database}
 \usage{
 so_diet(method = "get", cache_directory = "session",
@@ -22,6 +23,9 @@ so_energetics(method = "get", cache_directory = "session",
   refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
 
 so_lipids(method = "get", cache_directory = "session",
+  refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
+
+so_sources(method = "get", cache_directory = "session",
   refresh_cache = FALSE, public_only = TRUE, verbose = FALSE)
 }
 \arguments{
