@@ -29,9 +29,11 @@ so_doi <- function(cache_directory) {
 }
 
 ## internal, default to this DOI if necessary
-so_default_doi <- function() "10.26179/5ba3396f46e42"
+## this is the DOI of the latest version
+so_default_doi <- function() "10.26179/5d1aec22f41d5"
 
 ## DOI versions
 ##
+## 3-Jul-2019 "10.26179/5d1aec22f41d5"
 ## 21-Sep-2018 "10.26179/5ba3396f46e42"
 ## 9-Aug-2018 "10.26179/5b6cd40bb6935"

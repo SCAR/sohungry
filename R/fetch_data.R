@@ -117,7 +117,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             my_doi <- if (!file.exists(my_data_file)) {
                           NA_character_
                       } else {
-                          tryCatch(gsub("[[:space:]]+", "", readLines(my_data_file)[1]), error = function(e) NA_character_)
+                          tryCatch(sub("^doi:", "", gsub("[[:space:]]+", "", readLines(my_data_file)[1]), ignore.case = TRUE), error = function(e) NA_character_)
                       }
             return(my_doi)
         }
