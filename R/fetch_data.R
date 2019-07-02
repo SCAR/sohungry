@@ -250,7 +250,16 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
     }
     zip_file_name <- file.path(cache_directory, zip_file_name)
 
-    download_url <- "https://data.aad.gov.au/eds/4722/download"
+    ##
+    ##download_url <- "https://data.aad.gov.au/eds/4722/download"
+    ## get download URL from metadata record
+    download_url <- xml2::read_html("https://data.aad.gov.au/metadata/records/SCAR_Diet_Energetics")
+    download_url <- rvest::html_nodes(download_url, "a")
+    download_url <- vapply(download_url, function(z) rvest::html_attr(z, "href"), FUN.VALUE = "")
+    download_url <- unique(download_url[grepl("/eds/[[:digit:]]+/download", download_url)])
+    if (length(download_url) != 1) {
+        stop("Sorry, the download URL could not be retrieved from the metadata record. ", so_opt("issue_text"))
+    }
     ## http://data.aad.gov.au/geoserver/aadc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=aadc:TROPHIC_DIET&maxFeatures=100000&outputFormat=csv
     ## fetch data if needed
     if (!use_existing_zip) {
