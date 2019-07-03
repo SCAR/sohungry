@@ -1,4 +1,6 @@
-#' Apply stable isotope corrections following various published methods
+#' Stable isotope corrections
+#'
+#' Apply stable isotope corrections following various published methods.
 #'
 #' Methods:
 #' \itemize{
@@ -18,13 +20,12 @@
 #' @param method string: one of "Weldrick 2019", "Kiljunen 2006", "Kiljunen 2006 atomic" "Post 2007" "Smyntek 2007" "Smyntek 2007 atomic" "Logan 2008" "Syvaranta 2010" (see Details)
 #' @param cn_ratio_type string: the basis of the C:N ratio (either "mass" or "atomic")
 #'
-#' @return A data.frame with corrected values, comprising one or more of the columns "d13c", "d15n", "cn_ratio"
+#' @return A data.frame with corrected values, comprising one or more of the columns "d13c", "d15n", "cn_ratio" depending on the method.
 #'
 #' @seealso \code{\link{so_isotopes}}
 #'
 #' @examples
-#'
-#' ## correct bulk d13C according to Weldrick et al. 2019
+#' ## lipid normalization of bulk d13C following Weldrick et al. 2019
 #' so_isotope_adjust(d13c = -26.816, cn_ratio = 3.7014, cn_ratio_type = "mass",
 #'                   method = "Weldrick 2019")
 #'

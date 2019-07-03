@@ -2,7 +2,7 @@
 % Please edit documentation in R/isotope_corrections.R
 \name{so_isotope_adjust}
 \alias{so_isotope_adjust}
-\title{Apply stable isotope corrections following various published methods}
+\title{Stable isotope corrections}
 \usage{
 so_isotope_adjust(d13c = NULL, d15n = NULL, cn_ratio = NULL, method,
   cn_ratio_type = "mass")
@@ -19,9 +19,12 @@ so_isotope_adjust(d13c = NULL, d15n = NULL, cn_ratio = NULL, method,
 \item{cn_ratio_type}{string: the basis of the C:N ratio (either "mass" or "atomic")}
 }
 \value{
-A data.frame with corrected values, comprising one or more of the columns "d13c", "d15n", "cn_ratio"
+A data.frame with corrected values, comprising one or more of the columns "d13c", "d15n", "cn_ratio" depending on the method.
 }
 \description{
+Apply stable isotope corrections following various published methods.
+}
+\details{
 Methods:
 \itemize{
  \item "Weldrick 2019": lipid normalization of d13C values following Weldrick CK et al. (2019) Can lipid removal affect interpretation of resource partitioning from stable isotopes in Southern Ocean pteropods? Rapid Communications in Mass Spectrometry. https://doi.org/10.1002/rcm.8384
@@ -35,8 +38,7 @@ Methods:
 }
 }
 \examples{
-
-## correct bulk d13C according to Weldrick et al. 2019
+## lipid normalization of bulk d13C following Weldrick et al. 2019
 so_isotope_adjust(d13c = -26.816, cn_ratio = 3.7014, cn_ratio_type = "mass",
                   method = "Weldrick 2019")
 
