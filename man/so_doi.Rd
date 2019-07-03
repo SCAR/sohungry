@@ -4,10 +4,12 @@
 \alias{so_doi}
 \title{Return the DOI of the SCAR Diet and Energetics Database being used}
 \usage{
-so_doi(cache_directory)
+so_doi(cache_directory, ...)
 }
 \arguments{
 \item{cache_directory}{string: (optional) the local cache directory containing the data. If no valid DOI is found in that directory, the return value will be \code{NA_character_}. If \code{cache_directory} is not supplied, the DOI of the data last accessed in this session will be returned (and if no data has yet been accessed, the most recent known DOI will be returned)}
+
+\item{...}{: additional parameters passed to \code{so_diet} etc}
 }
 \value{
 string
@@ -27,5 +29,5 @@ Return the DOI of the SCAR Diet and Energetics Database being used
 
 }
 \seealso{
-\code{\link{so_diet}}
+\code{\link{so_diet}}, \code{\link{so_dna_diet}}, \code{\link{so_isotopes}}, \code{\link{so_energetics}}, \code{\link{so_lipids}}
 }

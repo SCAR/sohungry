@@ -1,10 +1,11 @@
 #' Return the DOI of the SCAR Diet and Energetics Database being used
 #'
 #' @param cache_directory string: (optional) the local cache directory containing the data. If no valid DOI is found in that directory, the return value will be \code{NA_character_}. If \code{cache_directory} is not supplied, the DOI of the data last accessed in this session will be returned (and if no data has yet been accessed, the most recent known DOI will be returned)
+#' @param ... : additional parameters passed to \code{so_diet} etc
 #'
 #' @return string
 #'
-#' @seealso \code{\link{so_diet}}
+#' @seealso \code{\link{so_diet}}, \code{\link{so_dna_diet}}, \code{\link{so_isotopes}}, \code{\link{so_energetics}}, \code{\link{so_lipids}}
 #'
 #' @examples
 #' \dontrun{
@@ -17,9 +18,9 @@
 #' }
 #'
 #' @export
-so_doi <- function(cache_directory) {
+so_doi <- function(cache_directory, ...) {
     if (!missing(cache_directory)) {
-        doi <- get_so_data("doi", method = "get", cache_directory = cache_directory)
+        doi <- get_so_data("doi", method = "get", cache_directory = cache_directory, ...)
     } else {
         doi <- so_opt("DOI") ## this is updated each time the data is read, so that it reflects the version being used
         ## if no data has yet been read, use default (latest) DOI
