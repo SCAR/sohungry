@@ -117,7 +117,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             my_doi <- if (!file.exists(my_data_file)) {
                           NA_character_
                       } else {
-                          tryCatch(sub("^doi:", "", gsub("[[:space:]]+", "", readLines(my_data_file)[1]), ignore.case = TRUE), error = function(e) NA_character_)
+                          tryCatch(sub("^doi:", "", gsub("[[:space:]]+", "", readLines(my_data_file, warn = FALSE)[1]), ignore.case = TRUE), error = function(e) NA_character_)
                       }
             return(my_doi)
         }
@@ -128,52 +128,84 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             stop("data file does not exist. Please try again using refresh_cache = TRUE. ", so_opt("issue_text"))
         }
         ## enforce some column formats, some of these fail the read_csv auto-detect
-        cols_fmt <- list(depth_min = "d", depth_max = "d", record_id = "d")
+        cols_fmt <- list(altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
         if (which_data %in% c("diet", "dna_diet")) {
+            cols_fmt$predator_life_stage <- "c"
             cols_fmt$predator_sample_count <- "d"
             cols_fmt$predator_sample_id <- "c"
             cols_fmt$predator_size_mean <- "d"
             cols_fmt$predator_size_min <- "d"
             cols_fmt$predator_size_max <- "d"
             cols_fmt$predator_size_sd <- "d"
+            cols_fmt$predator_size_units <- "c"
+            cols_fmt$predator_size_notes <- "c"
             cols_fmt$predator_mass_mean <- "d"
             cols_fmt$predator_mass_min <- "d"
             cols_fmt$predator_mass_max <- "d"
             cols_fmt$predator_mass_sd <- "d"
+            cols_fmt$predator_mass_units <- "c"
+            cols_fmt$predator_mass_notes <- "c"
+            for (wc in c("rank", "kingdom", "phylum", "class", "order", "family", "genus")) {
+                cols_fmt[[paste0("prey_worms_", wc)]] <- "c"
+                cols_fmt[[paste0("predator_worms_", wc)]] <- "c"
+            }
         }
         if (which_data %in% c("diet")) {
             cols_fmt$prey_size_mean <- "d"
             cols_fmt$prey_size_min <- "d"
             cols_fmt$prey_size_max <- "d"
             cols_fmt$prey_size_sd <- "d"
+            cols_fmt$prey_size_units <- "c"
+            cols_fmt$prey_size_notes <- "c"
             cols_fmt$prey_mass_mean <- "d"
             cols_fmt$prey_mass_min <- "d"
             cols_fmt$prey_mass_max <- "d"
             cols_fmt$prey_mass_sd <- "d"
+            cols_fmt$prey_mass_units <- "c"
+            cols_fmt$prey_mass_notes <- "c"
             cols_fmt$consumption_rate_mean <- "d"
             cols_fmt$consumption_rate_min <- "d"
             cols_fmt$consumption_rate_max <- "d"
             cols_fmt$consumption_rate_sd <- "d"
         }
+        if (which_data %in% c("dna_diet")) {
+            cols_fmt$blocking_primer <- "c"
+            cols_fmt$sequence_source_id <- "c"
+            cols_fmt$other_methods_applied <- "c"
+        }
         if (which_data %in% c("energetics", "isotopes", "isotopes_mv", "lipids")) {
             cols_fmt$taxon_sample_count <- "d"
             cols_fmt$taxon_sample_id <- "c"
+            for (wc in c("rank", "kingdom", "phylum", "class", "order", "family", "genus")) {
+                cols_fmt[[paste0("taxon_worms_", wc)]] <- "c"
+            }
         }
         if (which_data %in% c("isotopes")) {
             cols_fmt$taxon_size_mean <- "d"
             cols_fmt$taxon_size_min <- "d"
             cols_fmt$taxon_size_max <- "d"
             cols_fmt$taxon_size_sd <- "d"
+            cols_fmt$taxon_size_units <- "c"
             cols_fmt$taxon_mass_mean <- "d"
             cols_fmt$taxon_mass_min <- "d"
             cols_fmt$taxon_mass_max <- "d"
             cols_fmt$taxon_mass_sd <- "d"
+            cols_fmt$taxon_mass_units <- "c"
+            cols_fmt$c_n_ratio_variability_value <- "d"
+            cols_fmt$c_n_ratio_variability_type <- "c"
+            cols_fmt$taxon_group_soki <- "c"
+            cols_fmt$samples_were_pooled <- "c"
+            cols_fmt$physical_sample_id <- "c"
         }
         if (which_data %in% c("energetics", "isotopes_mv", "lipids")) {
             cols_fmt$measurement_mean_value <- "d"
             cols_fmt$measurement_min_value <- "d"
             cols_fmt$measurement_max_value <- "d"
             cols_fmt$measurement_variability_value <- "d"
+            cols_fmt$measurement_variability_type <- "c"
+            cols_fmt$taxon_group_soki <- "c"
+            cols_fmt$samples_were_pooled <- "c"
+            cols_fmt$physical_sample_id <- "c"
         }
         cols_fmt <- do.call(cols, cols_fmt)
         suppress(x <- read_csv(my_data_file, col_types = cols_fmt))
@@ -188,7 +220,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             if (!file.exists(my_doi_file)) {
                 so_default_doi()
             } else {
-                gsub("[[:space:]]+", "", readLines(my_doi_file)[1])
+                gsub("[[:space:]]+", "", readLines(my_doi_file, warn = FALSE)[1])
             }
             }, error = function(e) so_default_doi())
         so_set_opt(DOI = my_doi)
@@ -250,19 +282,17 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
     }
     zip_file_name <- file.path(cache_directory, zip_file_name)
 
-    ##
-    ##download_url <- "https://data.aad.gov.au/eds/4722/download"
-    ## get download URL from metadata record
-    download_url <- xml2::read_html("https://data.aad.gov.au/metadata/records/SCAR_Diet_Energetics")
-    download_url <- rvest::html_nodes(download_url, "a")
-    download_url <- vapply(download_url, function(z) rvest::html_attr(z, "href"), FUN.VALUE = "")
-    download_url <- unique(download_url[grepl("/eds/[[:digit:]]+/download", download_url)])
-    if (length(download_url) != 1) {
-        stop("Sorry, the download URL could not be retrieved from the metadata record. ", so_opt("issue_text"))
-    }
-    ## http://data.aad.gov.au/geoserver/aadc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=aadc:TROPHIC_DIET&maxFeatures=100000&outputFormat=csv
     ## fetch data if needed
     if (!use_existing_zip) {
+        ## get download URL from metadata record, should look like https://data.aad.gov.au/eds/4722/download (but the EDS ID will change with each new data version)
+        download_url <- xml2::read_html("https://data.aad.gov.au/metadata/records/SCAR_Diet_Energetics")
+        download_url <- rvest::html_nodes(download_url, "a")
+        download_url <- vapply(download_url, function(z) rvest::html_attr(z, "href"), FUN.VALUE = "")
+        download_url <- unique(download_url[grepl("/eds/[[:digit:]]+/download", download_url)])
+        if (length(download_url) != 1) {
+            stop("Sorry, the download URL could not be retrieved from the metadata record. ", so_opt("issue_text"))
+        }
+        ## http://data.aad.gov.au/geoserver/aadc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=aadc:TROPHIC_DIET&maxFeatures=100000&outputFormat=csv
         if (verbose) message("downloading data file from ", download_url, " to ", zip_file_name, " ...")
         chand <- new_handle()
         handle_setopt(chand, ssl_verifypeer = 0) ## temporarily, to avoid issues with AAD certs
