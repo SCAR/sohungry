@@ -5,6 +5,7 @@ sohungry
 
 [![Travis-CI Build Status](https://travis-ci.org/SCAR/sohungry.svg?branch=master)](https://travis-ci.org/SCAR/sohungry) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/SCAR/sohungry?branch=master&svg=true)](https://ci.appveyor.com/project/SCAR/sohungry) [![codecov](https://codecov.io/gh/SCAR/sohungry/branch/master/graph/badge.svg)](https://codecov.io/gh/SCAR/sohungry) [![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/sohungry)](http://cran.r-project.org/web/packages/sohungry) ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/sohungry)
 
+
 Overview
 --------
 

@@ -172,6 +172,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             cols_fmt$blocking_primer <- "c"
             cols_fmt$sequence_source_id <- "c"
             cols_fmt$other_methods_applied <- "c"
+            cols_fmt$dna_concentration <- "d"
         }
         if (which_data %in% c("energetics", "isotopes", "isotopes_mv", "lipids")) {
             cols_fmt$taxon_sample_count <- "d"
@@ -196,6 +197,10 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             cols_fmt$taxon_group_soki <- "c"
             cols_fmt$samples_were_pooled <- "c"
             cols_fmt$physical_sample_id <- "c"
+            cols_fmt$analytical_replicate_id <- "c"
+            cols_fmt$delta_34s_mean <- "d"
+            cols_fmt$delta_34s_variability_value <- "d"
+            cols_fmt$delta_34s_variability_type <- "c"
         }
         if (which_data %in% c("energetics", "isotopes_mv", "lipids")) {
             cols_fmt$measurement_mean_value <- "d"
@@ -206,6 +211,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             cols_fmt$taxon_group_soki <- "c"
             cols_fmt$samples_were_pooled <- "c"
             cols_fmt$physical_sample_id <- "c"
+            cols_fmt$analytical_replicate_id <- "c"
         }
         cols_fmt <- do.call(cols, cols_fmt)
         suppress(x <- read_csv(my_data_file, col_types = cols_fmt))
@@ -285,18 +291,10 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
     ## fetch data if needed
     if (!use_existing_zip) {
         download_url <- "https://github.com/SCAR/sohungry/releases/download/v2019.07.02/SCAR_Diet_Energetics.zip"
-        #### get download URL from metadata record, should look like https://data.aad.gov.au/eds/4722/download (but the EDS ID will change with each new data version)
-        ##download_url <- xml2::read_html("https://data.aad.gov.au/metadata/records/SCAR_Diet_Energetics")
-        ##download_url <- rvest::html_nodes(download_url, "a")
-        ##download_url <- vapply(download_url, function(z) rvest::html_attr(z, "href"), FUN.VALUE = "")
-        ##download_url <- unique(download_url[grepl("/eds/[[:digit:]]+/download", download_url)])
-        ##if (length(download_url) != 1) {
-        ##    stop("Sorry, the download URL could not be retrieved from the metadata record. ", so_opt("issue_text"))
-        ##}
-        ## http://data.aad.gov.au/geoserver/aadc/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=aadc:TROPHIC_DIET&maxFeatures=100000&outputFormat=csv
+        ##download_url <- "http://services.aad.gov.au/public/datasets/science/SCAR_Diet_Energetics/SCAR_Diet_Energetics.zip"
         if (verbose) message("downloading data file from ", download_url, " to ", zip_file_name, " ...")
         chand <- new_handle()
-        handle_setopt(chand, ssl_verifypeer = 0) ## temporarily, to avoid issues with AAD certs
+        ##handle_setopt(chand, ssl_verifypeer = 0) ## temporarily, to avoid issues with AAD certs
         handle_setheaders(chand, "Cache-Control" = "no-cache") ## no server-side caching please
         tryCatch(curl_download(download_url, destfile = zip_file_name, quiet = !verbose, mode = "wb", handle = chand),
                  error=function(e) {
