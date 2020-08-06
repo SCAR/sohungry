@@ -3,11 +3,7 @@
 \docType{package}
 \name{sohungry}
 \alias{sohungry}
-\alias{sohungry-package}
 \title{\pkg{sohungry}}
-\description{
-\pkg{sohungry}
-}
 \references{
 \url{http://data.aad.gov.au/trophic}
 }

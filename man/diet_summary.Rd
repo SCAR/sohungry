@@ -4,8 +4,12 @@
 \alias{diet_summary}
 \title{Diet summaries from the SCAR Southern Ocean Diet and Energetics Database}
 \usage{
-diet_summary(x, summary_type = "prey", minimum_importance = 0,
-  treat_trace_values_as = 0)
+diet_summary(
+  x,
+  summary_type = "prey",
+  minimum_importance = 0,
+  treat_trace_values_as = 0
+)
 }
 \arguments{
 \item{x}{data.frame: diet data, as returned by \code{so_diet}}

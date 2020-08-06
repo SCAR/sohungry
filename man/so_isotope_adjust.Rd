@@ -4,8 +4,13 @@
 \alias{so_isotope_adjust}
 \title{Stable isotope corrections}
 \usage{
-so_isotope_adjust(d13c = NULL, d15n = NULL, cn_ratio = NULL, method,
-  cn_ratio_type = "mass")
+so_isotope_adjust(
+  d13c = NULL,
+  d15n = NULL,
+  cn_ratio = NULL,
+  method,
+  cn_ratio_type = "mass"
+)
 }
 \arguments{
 \item{d13c}{numeric: d13C values}

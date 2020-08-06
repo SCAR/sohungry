@@ -4,8 +4,7 @@
 \alias{replace_by_importance}
 \title{Replace diet data entries below a given importance threshold}
 \usage{
-replace_by_importance(x, threshold, replace_with = NA,
-  which_measures = "all")
+replace_by_importance(x, threshold, replace_with = NA, which_measures = "all")
 }
 \arguments{
 \item{x}{data.frame: diet data, as returned by \code{so_diet}}
