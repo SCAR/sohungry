@@ -250,11 +250,19 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
 }
 
 
-## internal function to retrieve the zipped data file and unpack it
-soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE, cache_directory_only = FALSE) {
+## internal function to retrieve the zipped data file (and unpack it) or the zenodo record
+soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE, cache_directory_only = FALSE, what = "data", zenodo_id = so_opt("zenodo_id")) {
     ## fetch via GET, with local caching support
-    zip_file_name <- so_opt("zip_file") ## local basename for the zip file
-    use_existing_zip <- FALSE
+    assert_that(is.string(what))
+    what <- match.arg(tolower(what), c("data", "zenodo record"))
+    ## local basename for the file
+    if (what == "data") {
+        out_file_name <- so_opt("zip_file")
+    } else {
+        assert_that(!is.null(zenodo_id), !is.na(zenodo_id), length(zenodo_id) == 1)
+        out_file_name <- paste0(zenodo_id, ".json")
+    }
+    use_existing_file <- FALSE
     if (missing(cache_directory)) cache_directory <- "session"
     if (is.null(cache_directory)) {
         ## save to per-request temp dir
@@ -275,44 +283,78 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
         if (!ok) stop("could not create cache directory: ", cache_directory)
     } else {
         ## cache dir exists
-        use_existing_zip <- TRUE
+        use_existing_file <- TRUE
         cache_directory <- sub("[/\\]+$", "", cache_directory) ## remove trailing file sep
-        temp <- file.path(cache_directory, zip_file_name)
-        ## but don't use_existing_zip if we are refreshing it, or if the file doesn't exist
-        if (refresh_cache || !file.exists(temp)) use_existing_zip <- FALSE
+        temp <- file.path(cache_directory, out_file_name)
+        ## but don't use_existing_file if we are refreshing it, or if the file doesn't exist
+        if (refresh_cache || !file.exists(temp)) use_existing_file <- FALSE
         ## is cached copy old?
         if (file.exists(temp)) {
             if (!refresh_cache && difftime(Sys.time(), file.info(temp)$mtime, units = "days") > 30)
-                warning("cached copy of data is more than 30 days old, consider refreshing your copy")
+                warning("cached copy of ", what, " is more than 30 days old, consider refreshing your copy")
         }
     }
-    zip_file_name <- file.path(cache_directory, zip_file_name)
+    out_file_name <- file.path(cache_directory, out_file_name)
 
     ## fetch data if needed
-    if (!use_existing_zip) {
-        download_url <- "https://github.com/SCAR/sohungry/releases/download/v2019.07.02/SCAR_Diet_Energetics.zip"
-        ##download_url <- "http://services.aad.gov.au/public/datasets/science/SCAR_Diet_Energetics/SCAR_Diet_Energetics.zip"
-        if (verbose) message("downloading data file from ", download_url, " to ", zip_file_name, " ...")
+    do_unzip <- FALSE
+    if (!use_existing_file) {
+        download_url <- if (what == "data") z_data_url(refresh_cache = refresh_cache, verbose = verbose) else paste0("https://zenodo.org/api/records/", zenodo_id)
+        if (verbose) message("downloading ", what, " file from ", download_url, " to ", out_file_name, " ...")
         chand <- new_handle()
-        ##handle_setopt(chand, ssl_verifypeer = 0) ## temporarily, to avoid issues with AAD certs
         handle_setheaders(chand, "Cache-Control" = "no-cache") ## no server-side caching please
-        tryCatch(curl_download(download_url, destfile = zip_file_name, quiet = !verbose, mode = "wb", handle = chand),
+        tryCatch(curl_download(download_url, destfile = out_file_name, quiet = !verbose, mode = "wb", handle = chand),
                  error=function(e) {
                      ## clean up if download fails
-                     try(file.remove(zip_file_name), silent = TRUE)
+                     try(file.remove(out_file_name), silent = TRUE)
                      stop(e)
                  })
-        do_unzip <- TRUE
+        do_unzip <- what == "data"
     } else {
         ## using the existing zip
-        if (verbose) message("using cached data file: ", zip_file_name)
-        ## need to unzip if all files not present
-        do_unzip <- vapply(c(so_opt("sources_file"), so_opt("energetics_file"), so_opt("isotopes_file"), so_opt("diet_file"), so_opt("dna_diet_file"), so_opt("lipids_file")), function(z) file.exists(file.path(cache_directory, z)), FUN.VALUE = TRUE)
-        do_unzip <- !all(do_unzip)
+        if (verbose) message("using cached data file: ", out_file_name)
+        if (what == "data") {
+            ## need to unzip if all files not present
+            do_unzip <- vapply(c(so_opt("sources_file"), so_opt("energetics_file"), so_opt("isotopes_file"), so_opt("diet_file"), so_opt("dna_diet_file"), so_opt("lipids_file")), function(z) file.exists(file.path(cache_directory, z)), FUN.VALUE = TRUE)
+            do_unzip <- !all(do_unzip)
+        }
     }
     if (do_unzip) {
-        if (verbose) message("unzipping ", zip_file_name)
-        unzip(zip_file_name,exdir = cache_directory, junkpaths = TRUE)
+        if (verbose) message("unzipping ", out_file_name)
+        unzip(out_file_name, exdir = cache_directory, junkpaths = TRUE)
+    }
+    ## if we retrieved data, also now write the DOI into the cache_dir
+    if (what == "data") {
+        doi_file <- file.path(cache_directory, so_opt("doi_file"))
+        doi <- z_doi()
+        if (is.null(doi)) {
+            try(unlink(doi_file), silent = TRUE)
+        } else {
+            cat(doi, file = doi_file)
+        }
     }
     cache_directory
+}
+
+
+## cached retrieval of zenodo record
+z_get_record <- function(zenodo_id = so_opt("zenodo_id"), refresh_cache = FALSE, verbose = FALSE) {
+    ## default zenodo record id
+    json_file_name <- paste0(zenodo_id, ".json")
+    cache_dir <- soded_webget(what = "zenodo record", refresh_cache = refresh_cache, verbose = verbose)
+    json_file_name <- file.path(cache_dir, json_file_name)
+    jsonlite::fromJSON(json_file_name)
+}
+
+z_doi <- function(zenodo_id = so_opt("zenodo_id"), refresh_cache = FALSE, verbose = FALSE) {
+    jx <- z_get_record(zenodo_id = zenodo_id, refresh_cache = refresh_cache, verbose = verbose)
+    ne_or <- function(z, or) tryCatch(if (!is.null(z) && nzchar(z)) z else or, error = function(e) or)
+    ne_or(jx$doi, ne_or(jx$metadata$doi, NULL))
+}
+
+z_data_url <- function(zenodo_id = so_opt("zenodo_id"), refresh_cache = FALSE, verbose = FALSE) {
+    jx <- z_get_record(zenodo_id = zenodo_id, refresh_cache = refresh_cache, verbose = verbose)
+    ne_or <- function(z, or) tryCatch(if (!is.null(z) && nzchar(z)) z else or, error = function(e) or)
+    jx$files$links$self
+    ## "https://zenodo.org/record/3973742/files/SCAR_Diet_Energetics.zip?download=1" ## fallback
 }
