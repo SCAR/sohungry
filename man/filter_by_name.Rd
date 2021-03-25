@@ -30,10 +30,10 @@ A convenience function that matches on the species and/or group names.
 \examples{
 \dontrun{
   x <- so_isotopes()
-  x \%>\% filter_by_name(c("Electrona","Gymnoscopelus"),"taxon")
+  x \%>\% filter_by_name(c("Electrona", "Gymnoscopelus"), "taxon")
 
   x <- so_diet()
-  x \%>\% filter_by_name("Electrona carlsbergi",name_type="predator")
+  x \%>\% filter_by_name("Electrona carlsbergi", name_type = "predator")
   ## equivalent to
   x \%>\% filter_by_predator_name("Electrona carlsbergi")
 }

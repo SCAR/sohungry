@@ -17,12 +17,12 @@
 #' }
 #'
 #' @export
-replace_trace_values <- function(x,replace_with=0) {
+replace_trace_values <- function(x, replace_with = 0) {
     assert_that(is.number(replace_with) || is.na(replace_with))
-    is_trace <- function(z)z==-999
-    x %>% mutate_(fraction_diet_by_weight=~replace(fraction_diet_by_weight,is_trace(fraction_diet_by_weight),replace_with)) %>%
-        mutate_(fraction_diet_by_prey_items=~replace(fraction_diet_by_prey_items,is_trace(fraction_diet_by_prey_items),replace_with)) %>%
-        mutate_(fraction_occurrence=~replace(fraction_occurrence,is_trace(fraction_occurrence),replace_with))
+    is_trace <- function(z) z == -999
+    mutate(x, fraction_diet_by_weight = replace(.data$fraction_diet_by_weight, is_trace(.data$fraction_diet_by_weight), replace_with)) %>%
+        mutate(fraction_diet_by_prey_items = replace(.data$fraction_diet_by_prey_items, is_trace(.data$fraction_diet_by_prey_items), replace_with)) %>%
+        mutate(fraction_occurrence = replace(.data$fraction_occurrence, is_trace(.data$fraction_occurrence), replace_with))
 }
 
 
@@ -45,16 +45,16 @@ replace_trace_values <- function(x,replace_with=0) {
 #' }
 #'
 #' @export
-replace_by_importance <- function(x,threshold,replace_with=NA,which_measures="all") {
+replace_by_importance <- function(x, threshold, replace_with = NA, which_measures = "all") {
     assert_that(is.number(threshold))
     assert_that(is.number(replace_with) || is.na(replace_with))
     assert_that(is.character(which_measures))
-    which_measures <- match.arg(tolower(which_measures),c("all","fraction_diet_by_weight","fraction_diet_by_prey_items","fraction_occurrence"))
-    if (any(c("all","fraction_diet_by_weight") %in% which_measures))
-        x <- x %>% mutate_(fraction_diet_by_weight=~replace(fraction_diet_by_weight,fraction_diet_by_weight<threshold,replace_with))
-    if (any(c("all","fraction_diet_by_prey_items") %in% which_measures))
-        x <- x %>% mutate_(fraction_diet_by_prey_items=~replace(fraction_diet_by_prey_items,fraction_diet_by_prey_items<threshold,replace_with))
-    if (any(c("all","fraction_occurrence") %in% which_measures))
-        x <- x %>% mutate_(fraction_occurrence=~replace(fraction_occurrence,fraction_occurrence<threshold,replace_with))
+    which_measures <- match.arg(tolower(which_measures), c("all", "fraction_diet_by_weight", "fraction_diet_by_prey_items", "fraction_occurrence"))
+    if (any(c("all", "fraction_diet_by_weight") %in% which_measures))
+        x <- mutate(x, fraction_diet_by_weight = replace(.data$fraction_diet_by_weight, .data$fraction_diet_by_weight < threshold, replace_with))
+    if (any(c("all", "fraction_diet_by_prey_items") %in% which_measures))
+        x <- mutate(x, fraction_diet_by_prey_items = replace(.data$fraction_diet_by_prey_items, .data$fraction_diet_by_prey_items < threshold, replace_with))
+    if (any(c("all", "fraction_occurrence") %in% which_measures))
+        x <- mutate(x, fraction_occurrence = replace(.data$fraction_occurrence, .data$fraction_occurrence < threshold, replace_with))
     x
 }

@@ -104,7 +104,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         dbh <- aadcdb::db_open()
         x <- aadcdb::db_query(dbh, paste0("select * from ", so_opt(paste0(which_data, "_table")), where_string))
         ## backwards compat
-        if ("geometry_point" %in% names(x)) x <- x %>% select_(quote(-geometrypoint))
+        if ("geometry_point" %in% names(x)) x <- dplyr::select(x, .data$geometrypoint)
         if ("last_modified" %in% names(x) && nrow(x)>0) x$last_modified <- ymd_hms(x$last_modified)
         if ("taxon_group" %in% names(x) && nrow(x)>0) x <- x %>% dplyr::rename(taxon_group_soki = "taxon_group")
         xs <- aadcdb::db_query(dbh, paste0("select * from ", so_opt("sources_table")))
@@ -128,7 +128,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             stop("data file does not exist. Please try again using refresh_cache = TRUE. ", so_opt("issue_text"))
         }
         ## enforce some column formats, some of these fail the read_csv auto-detect
-        cols_fmt <- list(altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
+        cols_fmt <- if (which_data == "sources") NULL else list(altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
         if (which_data %in% c("diet", "dna_diet")) {
             cols_fmt$predator_life_stage <- "c"
             cols_fmt$predator_sample_count <- "d"
@@ -213,7 +213,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             cols_fmt$physical_sample_id <- "c"
             cols_fmt$analytical_replicate_id <- "c"
         }
-        cols_fmt <- do.call(cols, cols_fmt)
+        if (!is.null(cols_fmt)) cols_fmt <- do.call(cols, cols_fmt)
         suppress(x <- read_csv(my_data_file, col_types = cols_fmt))
         my_data_file <- file.path(unzipped_data_dir, so_opt("sources_file"))
         if (!file.exists(my_data_file)) {
@@ -233,15 +233,15 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
     }
     if (!which_data %in% c("sources")) {
         xs <- dplyr::rename(xs, source_details = "details", source_doi = "doi")
-        x <- x %>% left_join(xs %>% select_at(c("source_id", "source_details", "source_doi")), by = "source_id")
+        x <- left_join(x, dplyr::select(xs, .data$source_id, .data$source_details, .data$source_doi), by = "source_id")
         if (which_data == "dna_diet") {
             ## coerce some columns
             x$sequence_source_id <- as.integer(x$sequence_source_id)
             ## also populate primer source and sequence source details, doi
-            temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
+            temp <- dplyr::select(xs, .data$source_id, .data$source_details, .data$source_doi) %>%
                 dplyr::rename(primer_source_id = "source_id", primer_source_details = "source_details", primer_source_doi = "source_doi")
             x <- x %>% left_join(temp, by = "primer_source_id")
-            temp <- xs %>% select_at(c("source_id", "source_details", "source_doi")) %>%
+            temp <- dplyr::select(xs, .data$source_id, .data$source_details, .data$source_doi) %>%
                 dplyr::rename(sequence_source_id = "source_id", sequence_source_details = "source_details", sequence_source_doi = "source_doi")
             x <- x %>% left_join(temp, by = "sequence_source_id")
         }

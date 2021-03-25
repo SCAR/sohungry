@@ -15,10 +15,10 @@
 #' @examples
 #' \dontrun{
 #'   x <- so_isotopes()
-#'   x %>% filter_by_name(c("Electrona","Gymnoscopelus"),"taxon")
+#'   x %>% filter_by_name(c("Electrona", "Gymnoscopelus"), "taxon")
 #'
 #'   x <- so_diet()
-#'   x %>% filter_by_name("Electrona carlsbergi",name_type="predator")
+#'   x %>% filter_by_name("Electrona carlsbergi", name_type = "predator")
 #'   ## equivalent to
 #'   x %>% filter_by_predator_name("Electrona carlsbergi")
 #' }
@@ -58,17 +58,17 @@ filter_by_name <- function(x,name,name_type) {
         flt <- gsub("predator_","taxon_",flt)
     }
     flt <- paste(flt,collapse=" | ")
-    x %>% filter_(flt)
+    dplyr::filter(x, !!rlang::parse_expr(flt))
 }
 
 
 #' @rdname filter_by_name
 #' @export
-filter_by_predator_name <- function(x,name) filter_by_name(x,name,name_type="predator")
+filter_by_predator_name <- function(x,name) filter_by_name(x, name, name_type = "predator")
 
 #' @rdname filter_by_name
 #' @export
-filter_by_prey_name <- function(x,name) filter_by_name(x,name,name_type="prey")
+filter_by_prey_name <- function(x,name) filter_by_name(x, name, name_type = "prey")
 
 #' Filter out diet data below a given importance threshold
 #'
@@ -85,16 +85,16 @@ filter_by_prey_name <- function(x,name) filter_by_name(x,name,name_type="prey")
 #'
 #' @examples
 #' \dontrun{
-#'   x <- so_isotopes()
+#'   x <- so_diet()
 #'   x %>% filter_by_importance(0.1)
 #' }
 #'
 #' @export
-filter_by_importance <- function(x,threshold,which_measures="any") {
+filter_by_importance <- function(x, threshold, which_measures = "any") {
     assert_that(is.number(threshold))
     assert_that(is.character(which_measures))
-    which_measures <- match.arg(tolower(which_measures),c("any","fraction_diet_by_weight","fraction_diet_by_prey_items","fraction_occurrence"))
-    if (which_measures=="any") which_measures <- c("fraction_diet_by_weight","fraction_diet_by_prey_items","fraction_occurrence")
-    flt <- paste0(which_measures,">=threshold",collapse=" | ")
-    x %>% filter_(as.formula(paste0("~",flt)))
+    which_measures <- match.arg(tolower(which_measures), c("any", "fraction_diet_by_weight", "fraction_diet_by_prey_items", "fraction_occurrence"))
+    if (which_measures == "any") which_measures <- c("fraction_diet_by_weight", "fraction_diet_by_prey_items", "fraction_occurrence")
+    flt <- paste0(which_measures, ">=threshold", collapse = " | ")
+    dplyr::filter(x, !!rlang::parse_expr(flt))
 }

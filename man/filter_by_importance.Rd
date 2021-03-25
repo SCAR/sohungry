@@ -22,7 +22,7 @@ Records with all-NA importance values will be removed.
 }
 \examples{
 \dontrun{
-  x <- so_isotopes()
+  x <- so_diet()
   x \%>\% filter_by_importance(0.1)
 }
 

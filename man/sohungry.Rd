@@ -4,6 +4,9 @@
 \name{sohungry}
 \alias{sohungry}
 \title{\pkg{sohungry}}
+\description{
+Provides access to data from the SCAR Southern Ocean Diet and Energetics Database.
+}
 \references{
 \url{http://data.aad.gov.au/trophic}
 }
