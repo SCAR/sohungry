@@ -24,15 +24,14 @@ knitr::opts_chunk$set(
 
 ## Overview
 
-This R package provides access to the SCAR Southern Ocean Diet and Energetics Database, and some tools for working with these data. For more information about the database see http://data.aad.gov.au/trophic/.
+This R package provides access to the SCAR Southern Ocean Diet and Energetics Database, and some tools for working with these data. For more information about the database see https://scar.org/resources/southern-ocean-diet-energetics/.
 
 
 ### Installing
 
 ```{r eval=FALSE}
-install.packages("devtools")
-library(devtools)
-install_github("SCAR/sohungry")
+## install.packages("remotes") ## if needed
+remotes::install_github("SCAR/sohungry")
 ```
 
 ## Usage
