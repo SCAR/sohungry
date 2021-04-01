@@ -8,5 +8,5 @@
 Provides access to data from the SCAR Southern Ocean Diet and Energetics Database.
 }
 \references{
-\url{http://data.aad.gov.au/trophic}
+\url{https://scar.org/resources/southern-ocean-diet-energetics/}
 }

@@ -103,6 +103,3 @@ The \code{format} parameter was introduced to the \code{so_isotopes} function in
   x <- so_lipids()
 }
 }
-\references{
-\url{http://data.aad.gov.au/trophic/}
-}
