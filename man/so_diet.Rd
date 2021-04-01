@@ -59,13 +59,13 @@ so_sources(
 )
 }
 \arguments{
-\item{method}{string: "get" (fetch the data via a web GET call) or "direct" (direct database connection, for internal AAD use only)}
+\item{method}{string: "get" (fetch the data via a web GET call)}
 
 \item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. Values can be "session" (a per-session temporary directory will be used, default), "persistent" (the directory returned by \code{rappdirs::user_cache_dir} will be used), or a string giving the path to the directory to use. Use \code{NULL} for no caching. An attempt will be made to create the cache directory if it does not exist. A warning will be given if a cached copy of the data file exists and is more than 30 days old. Use \code{refresh_cache = TRUE} to refresh the cached data if necessary}
 
 \item{refresh_cache}{logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used}
 
-\item{public_only}{logical: only applicable to \code{method} "direct"}
+\item{public_only}{logical: ignored, here for historical reasons}
 
 \item{verbose}{logical: show progress messages?}
 

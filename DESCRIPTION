@@ -22,7 +22,6 @@ Imports:
   rvest,
   xml2
 Suggests:
-  aadcdb,
   covr,
   ggplot2,
   knitr,
