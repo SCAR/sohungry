@@ -183,6 +183,9 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         cols_fmt$delta_34s_mean <- "d"
         cols_fmt$delta_34s_variability_value <- "d"
         cols_fmt$delta_34s_variability_type <- "c"
+        cols_fmt$analytical_replicate_id <- "d"
+        cols_fmt$analytical_replicate_count <- "i"
+        cols_fmt$physical_sample_id <- "d"
     }
     if (which_data %in% c("energetics", "isotopes_mv", "lipids")) {
         cols_fmt$taxon_sample_id <- "d"
