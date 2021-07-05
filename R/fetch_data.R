@@ -115,7 +115,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
     if (which_data %in% c("diet", "dna_diet")) {
         cols_fmt$predator_life_stage <- "c"
         cols_fmt$predator_sample_count <- "d"
-        cols_fmt$predator_sample_id <- "c"
+        cols_fmt$predator_sample_id <- "d"
         cols_fmt$predator_size_mean <- "d"
         cols_fmt$predator_size_min <- "d"
         cols_fmt$predator_size_max <- "d"
@@ -159,13 +159,12 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
     }
     if (which_data %in% c("energetics", "isotopes", "isotopes_mv", "lipids")) {
         cols_fmt$taxon_sample_count <- "d"
-        cols_fmt$taxon_sample_id <- "c"
+        cols_fmt$taxon_sample_id <- "d"
         for (wc in c("rank", "kingdom", "phylum", "class", "order", "family", "genus")) {
             cols_fmt[[paste0("taxon_worms_", wc)]] <- "c"
         }
     }
     if (which_data %in% c("isotopes")) {
-        cols_fmt$taxon_sample_id <- "d"
         cols_fmt$taxon_size_mean <- "d"
         cols_fmt$taxon_size_min <- "d"
         cols_fmt$taxon_size_max <- "d"
@@ -188,7 +187,6 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         cols_fmt$physical_sample_id <- "d"
     }
     if (which_data %in% c("energetics", "isotopes_mv", "lipids")) {
-        cols_fmt$taxon_sample_id <- "d"
         cols_fmt$measurement_method <- "c"
         cols_fmt$measurement_mean_value <- "d"
         cols_fmt$measurement_min_value <- "d"
@@ -196,6 +194,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         cols_fmt$measurement_variability_value <- "d"
         cols_fmt$measurement_variability_type <- "c"
         cols_fmt$taxon_group_soki <- "c"
+        cols_fmt$taxon_name_original <- "c"
         cols_fmt$samples_were_pooled <- "c"
         cols_fmt$physical_sample_id <- "d"
         cols_fmt$analytical_replicate_id <- "d"
