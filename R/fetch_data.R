@@ -52,7 +52,7 @@ so_dna_diet <- function(method = "get", cache_directory = "session", refresh_cac
 #' @export
 so_isotopes <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE, format = "mv") {
     assert_that(is.string(format))
-    format <- match.arg(tolower(format), c("mv"))
+    format <- match.arg(tolower(format), c("mv", "wide"))
     if (format == "wide") {
         stop("so_isotopes(..., format = \"wide\") is no longer supported")
     } else {
