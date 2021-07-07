@@ -31,7 +31,7 @@ so_isotopes(
   refresh_cache = FALSE,
   public_only = TRUE,
   verbose = FALSE,
-  format = "wide"
+  format = "mv"
 )
 
 so_energetics(
@@ -61,7 +61,7 @@ so_sources(
 \arguments{
 \item{method}{string: "get" (fetch the data via a web GET call)}
 
-\item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. Values can be "session" (a per-session temporary directory will be used, default), "persistent" (the directory returned by \code{rappdirs::user_cache_dir} will be used), or a string giving the path to the directory to use. Use \code{NULL} for no caching. An attempt will be made to create the cache directory if it does not exist. A warning will be given if a cached copy of the data file exists and is more than 30 days old. Use \code{refresh_cache = TRUE} to refresh the cached data if necessary}
+\item{cache_directory}{string: (optional) cache the data locally in this directory, so that they can be used offline later. Values can be "session" (a per-session temporary directory will be used, default), "persistent" (the directory returned by \code{\link[rappdirs:user_cache_dir]{rappdirs::user_cache_dir()}} will be used), or a string giving the path to the directory to use. Use \code{NULL} for no caching. An attempt will be made to create the cache directory if it does not exist. A warning will be given if a cached copy of the data file exists and is more than 30 days old. Use \code{refresh_cache = TRUE} to refresh the cached data if necessary}
 
 \item{refresh_cache}{logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used}
 
@@ -69,16 +69,16 @@ so_sources(
 
 \item{verbose}{logical: show progress messages?}
 
-\item{format}{string: (for \code{so_isotopes} only) if "wide", the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. See Details for future changes to the default value of this parameter}
+\item{format}{string: ignored, kept for historical purposes only}
 }
 \value{
 data.frame
 }
 \description{
-Load data from the SCAR Southern Ocean Diet and Energetics database. Data will be fetched from the remote server and optionally cached locally, or fetched from the local cache, depending on the arguments passed. Note that \code{so_isotopes} now has a \code{format} parameter - see Details below.
+Load data from the SCAR Southern Ocean Diet and Energetics database. Data will be fetched from the remote server and optionally cached locally, or fetched from the local cache, depending on the arguments passed.
 }
 \details{
-The \code{format} parameter was introduced to the \code{so_isotopes} function in package version 0.4.0. The current default \code{format} is "wide", in which case the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. Note that "mv" will become the default (and possibly only) option in a later release. Currently, \code{record_id} values in measurement-value format are not unique (they follow the \code{record_id} values from the wide format). The \code{record_id} values in measurement-value format are likely to change in a future release.
+The \code{format} parameter was introduced to the \code{so_isotopes} function in package version 0.4.0. The previous default \code{format} was "wide" (the data were formatted with one row per record and multiple measurements (of different isotopes) per row). With \code{format} "mv", the data were in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appeared in its own row. As of package version 0.9.0, "wide" has been hard-deprecated and "mv" is the only option.
 }
 \examples{
 \dontrun{
@@ -90,11 +90,8 @@ The \code{format} parameter was introduced to the \code{so_isotopes} function in
   x <- so_dna_diet()
   subset(x, predator_name == "Thalassarche melanophris")
 
-  ## stable isotopes in wide format
+  ## stable isotopes
   x <- so_isotopes()
-
-  ## stable isotopes in measurement-value (long) format
-  x <- so_isotopes(format = "mv")
 
   ## energetics data
   x <- so_energetics()

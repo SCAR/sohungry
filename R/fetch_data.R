@@ -1,15 +1,15 @@
 #' Load data from the SCAR Southern Ocean Diet and Energetics database
 #'
-#' Load data from the SCAR Southern Ocean Diet and Energetics database. Data will be fetched from the remote server and optionally cached locally, or fetched from the local cache, depending on the arguments passed. Note that \code{so_isotopes} now has a \code{format} parameter - see Details below.
+#' Load data from the SCAR Southern Ocean Diet and Energetics database. Data will be fetched from the remote server and optionally cached locally, or fetched from the local cache, depending on the arguments passed.
 #'
-#' The \code{format} parameter was introduced to the \code{so_isotopes} function in package version 0.4.0. The current default \code{format} is "wide", in which case the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. Note that "mv" will become the default (and possibly only) option in a later release. Currently, \code{record_id} values in measurement-value format are not unique (they follow the \code{record_id} values from the wide format). The \code{record_id} values in measurement-value format are likely to change in a future release.
+#' The `format` parameter was introduced to the `so_isotopes` function in package version 0.4.0. The previous default `format` was "wide" (the data were formatted with one row per record and multiple measurements (of different isotopes) per row). With `format` "mv", the data were in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appeared in its own row. As of package version 0.9.0, "wide" has been hard-deprecated and "mv" is the only option.
 #'
 #' @param method string: "get" (fetch the data via a web GET call)
-#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. Values can be "session" (a per-session temporary directory will be used, default), "persistent" (the directory returned by \code{rappdirs::user_cache_dir} will be used), or a string giving the path to the directory to use. Use \code{NULL} for no caching. An attempt will be made to create the cache directory if it does not exist. A warning will be given if a cached copy of the data file exists and is more than 30 days old. Use \code{refresh_cache = TRUE} to refresh the cached data if necessary
+#' @param cache_directory string: (optional) cache the data locally in this directory, so that they can be used offline later. Values can be "session" (a per-session temporary directory will be used, default), "persistent" (the directory returned by [rappdirs::user_cache_dir()] will be used), or a string giving the path to the directory to use. Use `NULL` for no caching. An attempt will be made to create the cache directory if it does not exist. A warning will be given if a cached copy of the data file exists and is more than 30 days old. Use `refresh_cache = TRUE` to refresh the cached data if necessary
 #' @param refresh_cache logical: if TRUE, and data already exist in the cache_directory, they will be refreshed. If FALSE, the cached data will be used
 #' @param public_only logical: ignored, here for historical reasons
 #' @param verbose logical: show progress messages?
-#' @param format string: (for \code{so_isotopes} only) if "wide", the data will be formatted with one row per record and multiple measurements (of different isotopes) per row. If \code{format} is "mv", the data will be in measurement-value (long) format with multiple rows per original record, split so that each different isotope measurement appears in its own row. See Details for future changes to the default value of this parameter
+#' @param format string: ignored, kept for historical purposes only
 #'
 #' @return data.frame
 #'
@@ -23,11 +23,8 @@
 #'   x <- so_dna_diet()
 #'   subset(x, predator_name == "Thalassarche melanophris")
 #'
-#'   ## stable isotopes in wide format
+#'   ## stable isotopes
 #'   x <- so_isotopes()
-#'
-#'   ## stable isotopes in measurement-value (long) format
-#'   x <- so_isotopes(format = "mv")
 #'
 #'   ## energetics data
 #'   x <- so_energetics()
@@ -53,12 +50,11 @@ so_dna_diet <- function(method = "get", cache_directory = "session", refresh_cac
 
 #' @rdname so_diet
 #' @export
-so_isotopes <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE, format = "wide") {
+so_isotopes <- function(method = "get", cache_directory = "session", refresh_cache = FALSE, public_only = TRUE, verbose = FALSE, format = "mv") {
     assert_that(is.string(format))
-    format <- match.arg(tolower(format), c("wide", "mv"))
+    format <- match.arg(tolower(format), c("mv"))
     if (format == "wide") {
-        sodata_type <- "isotopes"
-        warning("format = \"mv\" will become the default (and possibly only) format option for so_isotopes in a later release of the sohungry package. Consider changing your code now to use this format.\nFor more information see help(\"so_isotopes\") or the package NEWS.md file on https://github.com/SCAR/sohungry")
+        stop("so_isotopes(..., format = \"wide\") is no longer supported")
     } else {
         sodata_type <- "isotopes_mv"
     }
@@ -301,7 +297,7 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
         if (verbose) message("using cached data file: ", out_file_name)
         if (what == "data") {
             ## need to unzip if all files not present
-            do_unzip <- vapply(c(so_opt("sources_file"), so_opt("energetics_file"), so_opt("isotopes_file"), so_opt("diet_file"), so_opt("dna_diet_file"), so_opt("lipids_file")), function(z) file.exists(file.path(cache_directory, z)), FUN.VALUE = TRUE)
+            do_unzip <- vapply(c(so_opt("sources_file"), so_opt("energetics_file"), so_opt("isotopes_mv_file"), so_opt("diet_file"), so_opt("dna_diet_file"), so_opt("lipids_file")), function(z) file.exists(file.path(cache_directory, z)), FUN.VALUE = TRUE)
             do_unzip <- !all(do_unzip)
         }
     }
@@ -342,5 +338,5 @@ z_data_url <- function(zenodo_id = so_opt("zenodo_id"), refresh_cache = FALSE, v
     jx <- z_get_record(zenodo_id = zenodo_id, refresh_cache = refresh_cache, verbose = verbose)
     ne_or <- function(z, or) tryCatch(if (!is.null(z) && nzchar(z)) z else or, error = function(e) or)
     jx$files$links$self
-    ## "https://zenodo.org/record/3973742/files/SCAR_Diet_Energetics.zip?download=1" ## fallback
+    ## "https://zenodo.org/record/5072528/files/SCAR_Diet_Energetics.zip?download=1" ## fallback
 }

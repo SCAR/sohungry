@@ -1,3 +1,9 @@
+# sohungry 0.9.0
+
+* Breaking change: `format = "wide"` is no longer supported for `so_isotopes`
+
+* Linked to the 2021-07-05 version of the dataset (https://doi.org/10.5281/zenodo.5072528)
+
 # sohungry 0.4.0
 
 * Added a `NEWS.md` file to track changes to the package.

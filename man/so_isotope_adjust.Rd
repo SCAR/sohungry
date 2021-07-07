@@ -32,14 +32,14 @@ Apply stable isotope corrections following various published methods.
 \details{
 Methods:
 \itemize{
- \item "Weldrick 2019": lipid normalization of d13C values following Weldrick CK et al. (2019) Can lipid removal affect interpretation of resource partitioning from stable isotopes in Southern Ocean pteropods? Rapid Communications in Mass Spectrometry. https://doi.org/10.1002/rcm.8384
- \item "Kiljunen 2006": lipid normalization of d13C values following Kiljunen M et al. (2006) A revised model for lipid-normalizing d13C values from aquatic organisms, with implications for isotope mixing models. Journal of Applied Ecology. https://doi.org/10.1111/j.1365-2664.2006.01224.x
- \item "Kiljunen 2006 atomic": as for Kiljunen 2006 but using atomic C:N ratio
- \item "Post 2007": lipid normalization of d13C values followingPost DM et al. (2007) Getting to the fat of the matter: Models, methods and assumptions for dealing with lipids in stable isotope analyses. Oecologia. https://doi.org/10.1007/s00442-006-0630-x
- \item "Smyntek 2007": lipid normalization of d13C values following Smyntek PM et al. (2007) A standard protocol for stable isotope analysis of zooplankton in aquatic food web research using mass balance correction models. Limnol. Oceanogr. https://doi.org/10.4319/lo.2007.52.5.2135
- \item "Smyntek 2007 atomic": as for Smyntek 2007 but using atomic C:N ratio
- \item "Logan 2008": lipid normalization of d13C values following Logan JM et al. (2008) Lipid corrections in carbon and nitrogen stable isotope analyses: comparison of chemical extraction and modelling methods. Journal of Animal Ecology. https://doi.org/10.1111/j.1365-2656.2008.01394.x
- \item "Syvaranta 2010":  lipid normalization of d13C values following Syväranta J and Rautio M (2010) Zooplankton, lipids and stable isotopes: Importance of seasonal, latitudinal, and taxonomic differences. Canadian Journal of Fisheries and Aquatic Science. https://doi.org/10.1139/F10-091
+\item "Weldrick 2019": lipid normalization of d13C values following Weldrick CK et al. (2019) Can lipid removal affect interpretation of resource partitioning from stable isotopes in Southern Ocean pteropods? Rapid Communications in Mass Spectrometry. https://doi.org/10.1002/rcm.8384
+\item "Kiljunen 2006": lipid normalization of d13C values following Kiljunen M et al. (2006) A revised model for lipid-normalizing d13C values from aquatic organisms, with implications for isotope mixing models. Journal of Applied Ecology. https://doi.org/10.1111/j.1365-2664.2006.01224.x
+\item "Kiljunen 2006 atomic": as for Kiljunen 2006 but using atomic C:N ratio
+\item "Post 2007": lipid normalization of d13C values followingPost DM et al. (2007) Getting to the fat of the matter: Models, methods and assumptions for dealing with lipids in stable isotope analyses. Oecologia. https://doi.org/10.1007/s00442-006-0630-x
+\item "Smyntek 2007": lipid normalization of d13C values following Smyntek PM et al. (2007) A standard protocol for stable isotope analysis of zooplankton in aquatic food web research using mass balance correction models. Limnol. Oceanogr. https://doi.org/10.4319/lo.2007.52.5.2135
+\item "Smyntek 2007 atomic": as for Smyntek 2007 but using atomic C:N ratio
+\item "Logan 2008": lipid normalization of d13C values following Logan JM et al. (2008) Lipid corrections in carbon and nitrogen stable isotope analyses: comparison of chemical extraction and modelling methods. Journal of Animal Ecology. https://doi.org/10.1111/j.1365-2656.2008.01394.x
+\item "Syvaranta 2010":  lipid normalization of d13C values following Syväranta J and Rautio M (2010) Zooplankton, lipids and stable isotopes: Importance of seasonal, latitudinal, and taxonomic differences. Canadian Journal of Fisheries and Aquatic Science. https://doi.org/10.1139/F10-091
 }
 }
 \examples{
