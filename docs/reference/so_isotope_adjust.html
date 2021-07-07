@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Filter data by predator, prey, or taxon name — filter_by_name • sohungry</title>
+<title>Stable isotope corrections — so_isotope_adjust • sohungry</title>
 
 
 <!-- jquery -->
@@ -39,10 +39,8 @@
 
 
 
-<meta property="og:title" content="Filter data by predator, prey, or taxon name — filter_by_name" />
-<meta property="og:description" content="A convenience function that matches on the species and/or group names.
-filter_by_predator_name is a convenience shorthand for filter_by_name(...,name_type=&quot;predator&quot;)
-filter_by_prey_name is a convenience shorthand for filter_by_name(...,name_type=&quot;prey&quot;)" />
+<meta property="og:title" content="Stable isotope corrections — so_isotope_adjust" />
+<meta property="og:description" content="Apply stable isotope corrections following various published methods." />
 
 
 
@@ -116,58 +114,74 @@ filter_by_prey_name is a convenience shorthand for filter_by_name(...,name_type=
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Filter data by predator, prey, or taxon name</h1>
-    <small class="dont-index">Source: <a href='https://github.com/SCAR/sohungry/blob/master/R/filter.R'><code>R/filter.R</code></a></small>
-    <div class="hidden name"><code>filter_by_name.Rd</code></div>
+    <h1>Stable isotope corrections</h1>
+    <small class="dont-index">Source: <a href='https://github.com/SCAR/sohungry/blob/master/R/isotope_corrections.R'><code>R/isotope_corrections.R</code></a></small>
+    <div class="hidden name"><code>so_isotope_adjust.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>A convenience function that matches on the species and/or group names.
-<code>filter_by_predator_name</code> is a convenience shorthand for <code>filter_by_name(...,name_type="predator")</code>
-<code>filter_by_prey_name</code> is a convenience shorthand for <code>filter_by_name(...,name_type="prey")</code></p>
+    <p>Apply stable isotope corrections following various published methods.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>filter_by_name</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>name</span>, <span class='va'>name_type</span><span class='op'>)</span>
-
-<span class='fu'>filter_by_predator_name</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>name</span><span class='op'>)</span>
-
-<span class='fu'>filter_by_prey_name</span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>name</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>so_isotope_adjust</span><span class='op'>(</span>
+  d13c <span class='op'>=</span> <span class='cn'>NULL</span>,
+  d15n <span class='op'>=</span> <span class='cn'>NULL</span>,
+  cn_ratio <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>method</span>,
+  cn_ratio_type <span class='op'>=</span> <span class='st'>"mass"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x</th>
-      <td><p>data.frame: diet data as returned by e.g. <code>so_diet</code> or <code>so_isotopes</code></p></td>
+      <th>d13c</th>
+      <td><p>numeric: d13C values</p></td>
     </tr>
     <tr>
-      <th>name</th>
-      <td><p>character: vector of one or more names to match on</p></td>
+      <th>d15n</th>
+      <td><p>numeric: d15n values</p></td>
     </tr>
     <tr>
-      <th>name_type</th>
-      <td><p>string: one of "predator", "prey", "predatorprey" (to match on either predator names or prey names), or "taxon". If missing will default to predator names for diet data, and taxon names for isotope data</p></td>
+      <th>cn_ratio</th>
+      <td><p>numeric: C:N ratio values</p></td>
+    </tr>
+    <tr>
+      <th>method</th>
+      <td><p>string: one of "Weldrick 2019", "Kiljunen 2006", "Kiljunen 2006 atomic" "Post 2007" "Smyntek 2007" "Smyntek 2007 atomic" "Logan 2008" "Syvaranta 2010" (see Details)</p></td>
+    </tr>
+    <tr>
+      <th>cn_ratio_type</th>
+      <td><p>string: the basis of the C:N ratio (either "mass" or "atomic")</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>data.frame</p>
+    <p>A data.frame with corrected values, comprising one or more of the columns "d13c", "d15n", "cn_ratio" depending on the method.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Methods:</p><ul>
+<li><p>"Weldrick 2019": lipid normalization of d13C values following Weldrick CK et al. (2019) Can lipid removal affect interpretation of resource partitioning from stable isotopes in Southern Ocean pteropods? Rapid Communications in Mass Spectrometry. https://doi.org/10.1002/rcm.8384</p></li>
+<li><p>"Kiljunen 2006": lipid normalization of d13C values following Kiljunen M et al. (2006) A revised model for lipid-normalizing d13C values from aquatic organisms, with implications for isotope mixing models. Journal of Applied Ecology. https://doi.org/10.1111/j.1365-2664.2006.01224.x</p></li>
+<li><p>"Kiljunen 2006 atomic": as for Kiljunen 2006 but using atomic C:N ratio</p></li>
+<li><p>"Post 2007": lipid normalization of d13C values followingPost DM et al. (2007) Getting to the fat of the matter: Models, methods and assumptions for dealing with lipids in stable isotope analyses. Oecologia. https://doi.org/10.1007/s00442-006-0630-x</p></li>
+<li><p>"Smyntek 2007": lipid normalization of d13C values following Smyntek PM et al. (2007) A standard protocol for stable isotope analysis of zooplankton in aquatic food web research using mass balance correction models. Limnol. Oceanogr. https://doi.org/10.4319/lo.2007.52.5.2135</p></li>
+<li><p>"Smyntek 2007 atomic": as for Smyntek 2007 but using atomic C:N ratio</p></li>
+<li><p>"Logan 2008": lipid normalization of d13C values following Logan JM et al. (2008) Lipid corrections in carbon and nitrogen stable isotope analyses: comparison of chemical extraction and modelling methods. Journal of Animal Ecology. https://doi.org/10.1111/j.1365-2656.2008.01394.x</p></li>
+<li><p>"Syvaranta 2010":  lipid normalization of d13C values following Syväranta J and Rautio M (2010) Zooplankton, lipids and stable isotopes: Importance of seasonal, latitudinal, and taxonomic differences. Canadian Journal of Fisheries and Aquatic Science. https://doi.org/10.1139/F10-091</p></li>
+</ul>
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='so_diet.html'>so_diet</a></code>, <code><a href='so_diet.html'>so_isotopes</a></code></p></div>
+    <div class='dont-index'><p><code><a href='so_diet.html'>so_isotopes</a></code></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-  <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='so_diet.html'>so_isotopes</a></span><span class='op'>(</span><span class='op'>)</span>
-  <span class='va'>x</span> <span class='op'>%&gt;%</span> <span class='fu'>filter_by_name</span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Electrona"</span>, <span class='st'>"Gymnoscopelus"</span><span class='op'>)</span>, <span class='st'>"taxon"</span><span class='op'>)</span>
-
-  <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='so_diet.html'>so_diet</a></span><span class='op'>(</span><span class='op'>)</span>
-  <span class='va'>x</span> <span class='op'>%&gt;%</span> <span class='fu'>filter_by_name</span><span class='op'>(</span><span class='st'>"Electrona carlsbergi"</span>, name_type <span class='op'>=</span> <span class='st'>"predator"</span><span class='op'>)</span>
-  <span class='co'>## equivalent to</span>
-  <span class='va'>x</span> <span class='op'>%&gt;%</span> <span class='fu'>filter_by_predator_name</span><span class='op'>(</span><span class='st'>"Electrona carlsbergi"</span><span class='op'>)</span>
-<span class='op'>}</span>
-
+    <pre class="examples"><div class='input'><span class='co'>## lipid normalization of bulk d13C following Weldrick et al. 2019</span>
+<span class='fu'>so_isotope_adjust</span><span class='op'>(</span>d13c <span class='op'>=</span> <span class='op'>-</span><span class='fl'>26.816</span>, cn_ratio <span class='op'>=</span> <span class='fl'>3.7014</span>, cn_ratio_type <span class='op'>=</span> <span class='st'>"mass"</span>,
+                  method <span class='op'>=</span> <span class='st'>"Weldrick 2019"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;      d13c
+#&gt; 1 -24.386</div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
