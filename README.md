@@ -20,6 +20,10 @@ more information about the database see
 ### Installing
 
 ``` r
+options(repos = c(scar = "https://scar.r-universe.dev", CRAN = "https://cloud.r-project.org"))
+install.packages("sohungry")
+
+## or install from github
 ## install.packages("remotes") ## if needed
 remotes::install_github("SCAR/sohungry")
 ```
