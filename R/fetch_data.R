@@ -107,7 +107,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         stop("data file does not exist. Please try again using refresh_cache = TRUE. ", so_opt("issue_text"))
     }
     ## enforce some column formats, some of these fail the read_csv auto-detect
-    cols_fmt <- if (which_data == "sources") NULL else list(altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
+    cols_fmt <- if (which_data == "sources") NULL else list(original_record_id = "c", altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
     if (which_data %in% c("diet", "dna_diet")) {
         cols_fmt$predator_life_stage <- "c"
         cols_fmt$predator_sample_count <- "d"
@@ -159,6 +159,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         for (wc in c("rank", "kingdom", "phylum", "class", "order", "family", "genus")) {
             cols_fmt[[paste0("taxon_worms_", wc)]] <- "c"
         }
+        cols_fmt$taxon_breeding_stage <- "c"
     }
     if (which_data %in% c("isotopes")) {
         cols_fmt$taxon_size_mean <- "d"
@@ -196,6 +197,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         cols_fmt$analytical_replicate_id <- "d"
         cols_fmt$analytical_replicate_count <- "i"
     }
+
     if (!is.null(cols_fmt)) cols_fmt <- do.call(cols, cols_fmt)
     suppress(x <- read_csv(my_data_file, col_types = cols_fmt))
     my_data_file <- file.path(unzipped_data_dir, so_opt("sources_file"))
