@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">sohungry</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.1</span>
       </span>
     </div>
 
@@ -70,13 +70,13 @@
 
       
 
-      </header><script src="sohungry_files/header-attrs-2.9/header-attrs.js"></script><div class="row">
+      </header><script src="sohungry_files/header-attrs-2.10/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Southen Ocean Diet and Energetics Data</h1>
                         <h4 class="author">Ben Raymond</h4>
             
-            <h4 class="date">2021-07-08</h4>
+            <h4 class="date">2021-11-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SCAR/sohungry/blob/master/vignettes/sohungry.Rmd"><code>vignettes/sohungry.Rmd</code></a></small>
       <div class="hidden name"><code>sohungry.Rmd</code></div>
@@ -120,7 +120,7 @@
 <p>Filter to taxon of interest, selecting d13C and d15N records:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">xi</span> <span class="op">%&gt;%</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">taxon_name</span> <span class="op">==</span> <span class="st">"Electrona carlsbergi"</span> <span class="op">&amp;</span> <span class="va">measurement_name</span> <span class="op">%in%</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"delta_13C"</span>, <span class="st">"delta_15N"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## # A tibble: 4 x 54
+<pre><code>## # A tibble: 4 × 54
 ##   record_id source_id original_record_id     location     west  east south north
 ##       &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;                  &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
 ## 1     1663.         8 Raymond et al. RECORD… Kerguelen …  71.2  72.2 -49.3 -49.1
@@ -133,19 +133,7 @@
 ## #   taxon_name_original &lt;chr&gt;, taxon_aphia_id &lt;dbl&gt;, taxon_worms_rank &lt;chr&gt;,
 ## #   taxon_worms_kingdom &lt;chr&gt;, taxon_worms_phylum &lt;chr&gt;,
 ## #   taxon_worms_class &lt;chr&gt;, taxon_worms_order &lt;chr&gt;, taxon_worms_family &lt;chr&gt;,
-## #   taxon_worms_genus &lt;chr&gt;, taxon_group_soki &lt;chr&gt;,
-## #   taxon_breeding_stage &lt;chr&gt;, taxon_life_stage &lt;chr&gt;, taxon_sex &lt;chr&gt;,
-## #   taxon_sample_count &lt;dbl&gt;, taxon_sample_id &lt;dbl&gt;, physical_sample_id &lt;dbl&gt;,
-## #   analytical_replicate_id &lt;dbl&gt;, analytical_replicate_count &lt;int&gt;,
-## #   samples_were_pooled &lt;chr&gt;, isotopes_pretreatment &lt;chr&gt;,
-## #   isotopes_are_adjusted &lt;chr&gt;, isotopes_adjustment_notes &lt;chr&gt;,
-## #   isotopes_carbonates_treatment &lt;chr&gt;, isotopes_lipids_treatment &lt;chr&gt;,
-## #   isotopes_body_part_used &lt;chr&gt;, measurement_name &lt;chr&gt;,
-## #   measurement_min_value &lt;dbl&gt;, measurement_max_value &lt;dbl&gt;,
-## #   measurement_mean_value &lt;dbl&gt;, measurement_variability_value &lt;dbl&gt;,
-## #   measurement_variability_type &lt;chr&gt;, measurement_units &lt;chr&gt;,
-## #   measurement_method &lt;chr&gt;, is_secondary_data &lt;chr&gt;, quality_flag &lt;chr&gt;,
-## #   notes &lt;chr&gt;, last_modified &lt;dttm&gt;, source_details &lt;chr&gt;, source_doi &lt;chr&gt;</code></pre>
+## #   taxon_worms_genus &lt;chr&gt;, taxon_group_soki &lt;chr&gt;, …</code></pre>
 </div>
 <div id="diet" class="section level3">
 <h3 class="hasAnchor">
@@ -479,7 +467,7 @@
 
 <span class="co">## what does this look like?</span>
 <span class="va">edx</span></code></pre></div>
-<pre><code>## # A tibble: 248 x 8
+<pre><code>## # A tibble: 248 × 8
 ##    source_id taxon_sample_id dry_weight energy_content standard_length
 ##        &lt;dbl&gt;           &lt;dbl&gt;      &lt;dbl&gt;          &lt;dbl&gt;           &lt;dbl&gt;
 ##  1        64              37    1.2               8.64              70
