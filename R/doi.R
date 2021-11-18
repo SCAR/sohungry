@@ -30,11 +30,12 @@ so_doi <- function(cache_directory, ...) {
 }
 
 ## internal, default to this DOI if necessary
-## this is the DOI of the latest version
-so_default_doi <- function() "10.5281/zenodo.5072528"
+## this is the concept DOI, which should always point to the most recent version
+so_default_doi <- function() "10.5281/zenodo.5072527"
 
 ## DOI versions
 ##
+## 18-Nov-2021 "10.5281/zenodo.5708934"
 ## 5-Jul-2021 "10.5281/zenodo.5072528"
 ## 2-Jul-2019 "10.26179/5d1aec22f41d5"
 ## 21-Sep-2018 "10.26179/5ba3396f46e42"
