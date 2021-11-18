@@ -18,9 +18,7 @@ Imports:
   lubridate,
   rappdirs,
   readr,
-  rlang,
-  rvest,
-  xml2
+  rlang
 Suggests:
   covr,
   ggplot2,
