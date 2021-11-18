@@ -5,7 +5,7 @@ test_that("data retrieval works", {
     xi <- so_isotopes(method="get")
     expect_error(xi <- so_isotopes(method="get", format="wide"), regexp = "no longer supported")
     xi2 <- so_isotopes(method="get", format="mv")
-    expect_identical(xi, xi2)
+    expect_equal(xi, xi2)
 
     xd <- so_diet(method="get")
 })
