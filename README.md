@@ -3,7 +3,7 @@
 
 # sohungry
 
-[![R-CMD-check](https://github.com/SCAR/sohungry/workflows/R-CMD-check/badge.svg)](https://github.com/SCAR/sohungry/actions)
+[![R-CMD-check](https://github.com/SCAR/sohungry/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SCAR/sohungry/actions/workflows/R-CMD-check.yaml)
 [![codecov](https://codecov.io/gh/SCAR/sohungry/branch/master/graph/badge.svg)](https://codecov.io/gh/SCAR/sohungry)
 [![Project Status: Active - The project has reached a stable, usable
 state and is being actively
