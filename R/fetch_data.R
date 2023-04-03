@@ -107,8 +107,14 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         stop("data file does not exist. Please try again using refresh_cache = TRUE. ", so_opt("issue_text"))
     }
     ## enforce some column formats, some of these fail the read_csv auto-detect
-    cols_fmt <- if (which_data == "sources") NULL else list(original_record_id = "c", altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
+    cols_fmt <- if (which_data == "sources") {
+                    NULL
+                } else {
+                    list(original_record_id = "c", altitude_min = "d", altitude_max = "d", depth_min = "d", depth_max = "d", record_id = "d", notes = "c")
+                }
     if (which_data %in% c("diet", "dna_diet")) {
+        cols_fmt$prey_group_soki <- "c"
+        cols_fmt$predator_group_soki <- "c"
         cols_fmt$predator_life_stage <- "c"
         cols_fmt$predator_sample_count <- "d"
         cols_fmt$predator_sample_id <- "d"
@@ -128,6 +134,7 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
             cols_fmt[[paste0("prey_worms_", wc)]] <- "c"
             cols_fmt[[paste0("predator_worms_", wc)]] <- "c"
         }
+        cols_fmt$qualitative_dietary_importance <- "c"
     }
     if (which_data %in% c("diet")) {
         cols_fmt$prey_size_mean <- "d"
@@ -146,12 +153,17 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         cols_fmt$consumption_rate_min <- "d"
         cols_fmt$consumption_rate_max <- "d"
         cols_fmt$consumption_rate_sd <- "d"
+        cols_fmt$consumption_rate_notes <- "c"
     }
     if (which_data %in% c("dna_diet")) {
         cols_fmt$blocking_primer <- "c"
         cols_fmt$sequence_source_id <- "c"
         cols_fmt$other_methods_applied <- "c"
         cols_fmt$dna_concentration <- "d"
+        cols_fmt$analytical_replicate_id <- "d"
+        cols_fmt$physical_sample_id <- "d"
+        cols_fmt$sequence_source_details <- "c"
+        cols_fmt$sequence_source_doi <- "c"
     }
     if (which_data %in% c("energetics", "isotopes", "isotopes_mv", "lipids")) {
         cols_fmt$taxon_sample_count <- "d"
@@ -174,7 +186,6 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
         cols_fmt$taxon_mass_units <- "c"
         cols_fmt$c_n_ratio_variability_value <- "d"
         cols_fmt$c_n_ratio_variability_type <- "c"
-        cols_fmt$taxon_group_soki <- "c"
         cols_fmt$samples_were_pooled <- "c"
         cols_fmt$delta_34s_mean <- "d"
         cols_fmt$delta_34s_variability_value <- "d"
@@ -200,6 +211,10 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
 
     if (!is.null(cols_fmt)) cols_fmt <- do.call(cols, cols_fmt)
     suppress(x <- read_csv(my_data_file, col_types = cols_fmt))
+    ## check for all-NA columns, which might indicate a cols_fmt problem
+    chk <- vapply(names(x), function(nm) all(is.na(x[[nm]])), FUN.VALUE = TRUE)
+    ## not for now, probably confusing to users
+    ##if (verbose && any(chk)) warning("all-NA columns, might indicate format problem: ", paste(names(chk)[chk], collapse = ", "))
     my_data_file <- file.path(unzipped_data_dir, so_opt("sources_file"))
     if (!file.exists(my_data_file)) {
         stop("sources file does not exist. Try again using refresh_cache = TRUE. ", so_opt("issue_text"))
