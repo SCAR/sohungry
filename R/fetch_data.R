@@ -232,15 +232,15 @@ get_so_data <- function(which_data, method, cache_directory, refresh_cache = FAL
     so_set_opt(DOI = my_doi)
     if (!which_data %in% c("sources")) {
         xs <- dplyr::rename(xs, source_details = "details", source_doi = "doi")
-        x <- left_join(x, dplyr::select(xs, .data$source_id, .data$source_details, .data$source_doi), by = "source_id")
+        x <- left_join(x, dplyr::select(xs, "source_id", "source_details", "source_doi"), by = "source_id")
         if (which_data == "dna_diet") {
             ## coerce some columns
             x$sequence_source_id <- as.integer(x$sequence_source_id)
             ## also populate primer source and sequence source details, doi
-            temp <- dplyr::select(xs, .data$source_id, .data$source_details, .data$source_doi) %>%
+            temp <- dplyr::select(xs, "source_id", "source_details", "source_doi") %>%
                 dplyr::rename(primer_source_id = "source_id", primer_source_details = "source_details", primer_source_doi = "source_doi")
             x <- x %>% left_join(temp, by = "primer_source_id")
-            temp <- dplyr::select(xs, .data$source_id, .data$source_details, .data$source_doi) %>%
+            temp <- dplyr::select(xs, "source_id", "source_details", "source_doi") %>%
                 dplyr::rename(sequence_source_id = "source_id", sequence_source_details = "source_details", sequence_source_doi = "source_doi")
             x <- x %>% left_join(temp, by = "sequence_source_id")
         }
@@ -258,6 +258,7 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
     if (what == "data") {
         out_file_name <- so_opt("zip_file")
     } else {
+        zenodo_id <- z_record_id_from_concept(zenodo_id)
         assert_that(!is.null(zenodo_id), !is.na(zenodo_id), length(zenodo_id) == 1)
         out_file_name <- paste0(zenodo_id, ".json")
     }
@@ -339,6 +340,7 @@ soded_webget <- function(cache_directory, refresh_cache = FALSE, verbose = FALSE
 ## cached retrieval of zenodo record
 z_get_record <- function(zenodo_id = so_opt("zenodo_id"), refresh_cache = FALSE, verbose = FALSE) {
     ## default zenodo record id
+    zenodo_id <- z_record_id_from_concept(zenodo_id)
     json_file_name <- paste0(zenodo_id, ".json")
     cache_dir <- soded_webget(what = "zenodo record", refresh_cache = refresh_cache, verbose = verbose)
     json_file_name <- file.path(cache_dir, json_file_name)
@@ -356,4 +358,17 @@ z_data_url <- function(zenodo_id = so_opt("zenodo_id"), refresh_cache = FALSE, v
     ne_or <- function(z, or) tryCatch(if (!is.null(z) && nzchar(z)) z else or, error = function(e) or)
     jx$files$links$self
     ## "https://zenodo.org/record/5072528/files/SCAR_Diet_Energetics.zip?download=1" ## fallback
+}
+
+## if the zenodo_id is missing or NA (which it will be on initial package load), resolve it from the concept ID
+z_record_id_from_concept <- function(zenodo_id = so_opt("zenodo_id"), cid = 5072527) {
+    if (is.null(zenodo_id) || is.na(zenodo_id)) {
+        recid <- tryCatch({
+            jx <- curl::curl_fetch_memory(paste0("https://zenodo.org/api/records/?q=conceptrecid:", cid))
+            jsonlite::fromJSON(rawToChar(jx$content))$hits$hits$id
+        }, error = function(e) NULL)
+        zenodo_id <- if (length(recid) != 1) so_latest_record_id() else recid
+        so_set_opt(zenodo_id = zenodo_id)
+    }
+    invisible(zenodo_id)
 }

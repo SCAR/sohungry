@@ -15,7 +15,7 @@
         dna_diet_file = "scar_dna_diet.csv",
         lipids_table = "ecology.dbo.scar_lipids",
         lipids_file = "scar_lipids.csv",
-        zenodo_id = 5072527, ## this is the concept ID, which should always point to the most recent version
+        zenodo_id = NA_integer_, ## this needs to be a record ID. We can't use the concept ID (5072527) here, the API only accepts actual record IDs. So we set it to NA, and it will be resolved to the latest record ID via z_record_id_from_concept() on first usage
         zip_file = "SCAR_Diet_Energetics.zip",
         issue_text = "If the problem persists, please lodge an issue at https://github.com/SCAR/sohungry/issues",
         session_cache_dir = file.path(tempdir(), "sohungry-cache"), ## cache directory to use for cache_directory = "session"

@@ -33,8 +33,11 @@ so_doi <- function(cache_directory, ...) {
 ## this is the concept DOI, which should always point to the most recent version
 so_default_doi <- function() "10.5281/zenodo.5072527"
 
+so_latest_record_id <- function() "7796465" ## latest record ID, use as fallback if lookup fails
+
 ## DOI versions
 ##
+## 4-Apr-2023  "10.5281/zenodo.7796465"
 ## 18-Nov-2021 "10.5281/zenodo.5708934"
 ## 5-Jul-2021 "10.5281/zenodo.5072528"
 ## 2-Jul-2019 "10.26179/5d1aec22f41d5"

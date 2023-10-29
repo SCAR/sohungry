@@ -1,7 +1,7 @@
 Package: sohungry
 Type: Package
 Title: Southern Ocean Diet and Energetics Data
-Version: 0.9.2
+Version: 0.9.3
 Authors@R: person("Ben", "Raymond", email = "ben.raymond@aad.gov.au", role = c("aut", "cre"))
 Description: Provides access to data from the SCAR Southern Ocean Diet and Energetics Database.
 URL: https://github.com/SCAR/sohungry
@@ -26,5 +26,5 @@ Suggests:
   rmarkdown,
   tidyr,
   testthat
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
